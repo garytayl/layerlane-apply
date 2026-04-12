@@ -21,6 +21,11 @@ Personal job search assistant: a small **dashboard** (source of truth for experi
 1. Create a Supabase project.
 2. Run the SQL in [`supabase/migrations/20250412130000_init.sql`](supabase/migrations/20250412130000_init.sql) in the Supabase SQL editor (or use `supabase db push` if you use the Supabase CLI linked to this project).
 3. In **Authentication → Providers**, enable **Email** (password or magic link as you prefer).
+4. Under **Authentication → URL Configuration**, set **Site URL** to your app origin (e.g. `http://localhost:3000` locally) and add these to **Redirect URLs** so confirmation and OAuth work:
+   - `http://localhost:3000/auth/callback`
+   - `http://127.0.0.1:3000/auth/callback` (optional)
+   - Your production URL + `/auth/callback` when deployed  
+   If `http://localhost:3000/auth/callback` is missing, Supabase may send users to `/` with `?code=` instead; the app forwards that to `/auth/callback`, but allowlisting is still recommended.
 
 ## 2. Web app (`apps/web`)
 
