@@ -1,4 +1,10 @@
 import Link from "next/link";
+import {
+  AuthFieldLabel,
+  AuthInput,
+  AuthPageShell,
+  AuthSubmitButton,
+} from "@/components/auth-page-shell";
 import { login } from "./actions";
 
 export default async function LoginPage({
@@ -10,51 +16,57 @@ export default async function LoginPage({
   const next = sp.next ?? "/bank";
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center gap-6 px-4">
-      <div>
-        <h1 className="text-2xl font-semibold">layerlane-apply</h1>
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          Sign in to your account
+    <AuthPageShell
+      eyebrow="Welcome back"
+      title="Sign in to layerlane-apply"
+      description="Your evidence bank, saved jobs, and analyses are tied to this account."
+      footer={
+        <p className="text-center text-sm text-neutral-600 dark:text-neutral-400">
+          No account yet?{" "}
+          <Link
+            href="/signup"
+            className="font-medium text-neutral-900 underline decoration-neutral-400 underline-offset-4 transition hover:decoration-neutral-900 dark:text-neutral-100 dark:decoration-neutral-600 dark:hover:decoration-neutral-100"
+          >
+            Create one
+          </Link>
         </p>
-      </div>
-      <form action={login} className="flex flex-col gap-4">
+      }
+    >
+      <form action={login} className="flex flex-col gap-5">
         <input type="hidden" name="next" value={next} />
-        <label className="flex flex-col gap-1 text-sm">
-          Email
-          <input
-            className="rounded border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-600 dark:bg-neutral-900"
+        <div>
+          <AuthFieldLabel htmlFor="login-email">Email</AuthFieldLabel>
+          <AuthInput
+            id="login-email"
             name="email"
             type="email"
             required
             autoComplete="email"
+            placeholder="you@example.com"
           />
-        </label>
-        <label className="flex flex-col gap-1 text-sm">
-          Password
-          <input
-            className="rounded border border-neutral-300 bg-white px-3 py-2 dark:border-neutral-600 dark:bg-neutral-900"
+        </div>
+        <div>
+          <AuthFieldLabel htmlFor="login-password">Password</AuthFieldLabel>
+          <AuthInput
+            id="login-password"
             name="password"
             type="password"
             required
             autoComplete="current-password"
+            placeholder="Your password"
           />
-        </label>
+        </div>
         {sp.error ? (
-          <p className="text-sm text-red-600">Could not sign you in.</p>
+          <div
+            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200"
+            role="alert"
+          >
+            Those credentials did not work. Check your email and password, or
+            create an account.
+          </div>
         ) : null}
-        <button
-          type="submit"
-          className="rounded bg-neutral-900 px-4 py-2 text-white dark:bg-neutral-100 dark:text-neutral-900"
-        >
-          Sign in
-        </button>
+        <AuthSubmitButton>Sign in</AuthSubmitButton>
       </form>
-      <p className="text-center text-sm text-neutral-600 dark:text-neutral-400">
-        No account?{" "}
-        <Link className="underline" href="/signup">
-          Sign up
-        </Link>
-      </p>
-    </div>
+    </AuthPageShell>
   );
 }
