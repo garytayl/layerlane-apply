@@ -24,11 +24,11 @@ Personal job search assistant: a small **dashboard** (source of truth for experi
 
 ## 2. Web app (`apps/web`)
 
-Copy environment variables:
+Copy environment variables. Templates: [`.env.example`](.env.example) (repo root) and [`apps/web/.env.example`](apps/web/.env.example) (same keys).
 
 ```bash
-cd apps/web
-cp .env.example .env.local
+cp .env.example apps/web/.env.local
+# or: cd apps/web && cp .env.example .env.local
 ```
 
 Set:
