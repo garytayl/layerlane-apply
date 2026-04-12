@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "layerlane-apply",
+  "version": "0.1.0",
+  "description": "Capture job postings and analyze against your evidence bank",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "layerlane-apply"
+  },
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": ["http://localhost/*", "http://127.0.0.1/*", "https://*/*"],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
