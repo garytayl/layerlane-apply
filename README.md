@@ -58,7 +58,7 @@ The repo has a root [`package.json`](package.json) with `"workspaces": ["apps/*"
 
 Add the same environment variables from the table above in the Vercel project settings (and set `NEXT_PUBLIC_APP_URL` to your production URL).
 
-Production builds use `next build` (webpack), not `next dev --turbopack`, so Tailwind’s `lightningcss` native bindings resolve correctly on Vercel’s Linux builders.
+The app uses **Tailwind CSS v3** with PostCSS (not v4 / `lightningcss` natives), which avoids optional native binary issues on Vercel Linux. `npm run dev` still uses `next dev --turbopack` for fast local iteration.
 
 ## 3. Browser extension (`extension`)
 
