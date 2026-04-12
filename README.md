@@ -41,15 +41,22 @@ Set:
 | `OPENAI_API_KEY` | For `/api/jobs/[id]/analyze` and server-side “Re-analyze” |
 | `NEXT_PUBLIC_APP_URL` | Public base URL of this app (used in signup email redirect), e.g. `http://localhost:3000` |
 
-Install and run:
+Install dependencies from the **repository root** (npm workspaces include `apps/web`):
 
 ```bash
-cd apps/web
 npm install
 npm run dev
 ```
 
+This runs the Next app via `npm run dev --workspace=web`. You can still use `cd apps/web && npm run dev` after a root `npm install` if you prefer.
+
 Open [http://localhost:3000](http://localhost:3000). Sign up, open **Settings**, generate an **API token** for the extension, and seed the **Bank** before running analysis.
+
+### Deploying on Vercel
+
+The repo has a root [`package.json`](package.json) with `"workspaces": ["apps/*"]` so Vercel detects **Next.js** and runs `npm run build` from the root (which builds the `web` workspace). **Framework Preset:** Next.js. **Root Directory:** leave default (repository root), unless you split projects.
+
+Add the same environment variables from the table above in the Vercel project settings (and set `NEXT_PUBLIC_APP_URL` to your production URL).
 
 ## 3. Browser extension (`extension`)
 
