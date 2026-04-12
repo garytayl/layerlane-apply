@@ -54,7 +54,7 @@ Open [http://localhost:3000](http://localhost:3000). Sign up, open **Settings**,
 
 ### Deploying on Vercel
 
-The repo has a root [`package.json`](package.json) with `"workspaces": ["apps/*"]` so Vercel detects **Next.js** and runs `npm run build` from the root (which builds the `web` workspace). **Framework Preset:** Next.js. **Root Directory:** leave default (repository root), unless you split projects.
+The repo has a root [`package.json`](package.json) with `"workspaces": ["apps/*"]` and **direct** `next` / `react` / `react-dom` entries (same versions as `apps/web`) so Vercel’s detector finds Next.js at the repo root. Build runs via `npm run build` → `web` workspace. **Framework Preset:** Next.js. **Root Directory:** repository root (default).
 
 Add the same environment variables from the table above in the Vercel project settings (and set `NEXT_PUBLIC_APP_URL` to your production URL).
 
