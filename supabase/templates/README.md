@@ -27,27 +27,20 @@ If you use `supabase start`, you can wire templates in `supabase/config.toml` wi
 
 ## Not receiving emails?
 
-Supabase sends mail from **their** infrastructure unless you add [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp). Check these in order:
-
 1. **Confirm email is required**  
-   **Authentication → Providers → Email** → enable **Confirm email** (if this is off, Supabase does not send a confirmation message; the app will log you straight in after signup).
+   In Supabase: **Authentication** → **Providers** → **Email**. If **Confirm email** is off, Supabase **does not send** a confirmation message — users are signed in immediately. The app now redirects straight to `/bank` when that happens.
 
-2. **Custom template broke sending**  
-   Temporarily reset **Confirm signup** in the dashboard to Supabase’s **default** HTML. If mail works again, fix your pasted template (invalid `{{ ... }}` or bad HTML can cause failures — see **Logs** below).
+2. **Check Auth logs**  
+   **Authentication** → **Logs** (or **Project** → **Logs** → filter Auth). Look for mailer errors, rate limits, or SMTP failures.
 
-3. **Redirect URL not allowed**  
-   **Authentication → URL Configuration → Redirect URLs** must include exactly  
-   `{NEXT_PUBLIC_APP_URL}/auth/callback`  
-   (e.g. `https://layerlane-apply.vercel.app/auth/callback`). A mismatch can make `signUp` fail; the app now shows the Supabase error on the signup form.
+3. **Spam / Promotions**  
+   Default Supabase sender addresses are easy for Gmail/Outlook to file under Spam until you use **custom SMTP** with your domain.
 
-4. **Rate limits & spam**  
-   Free projects have low auth-email limits. Wait and retry, check **spam/junk**, and try another inbox provider to rule out blocking.
+4. **Built-in email limits**  
+   The shared Supabase mailer has [strict rate limits](https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits). For production, configure **custom SMTP** ([docs](https://supabase.com/docs/guides/auth/auth-smtp)).
 
-5. **Supabase logs**  
-   **Logs → Auth** (or **Project → Logs**) for mailer errors when you sign up.
+5. **Redirect URL**  
+   `emailRedirectTo` must use a URL listed under **Authentication** → **URL Configuration** → **Redirect URLs**. A mismatch does not always block sending, but fix it so the link in the email works.
 
-6. **Production deliverability**  
-   For real users, configure **custom SMTP** (e.g. Resend, Postmark, SES) so messages come from your domain and land in the inbox.
-
-7. **Local CLI**  
-   With `supabase start`, auth mail is usually captured in [Inbucket](http://127.0.0.1:54324) (see local Supabase output for the URL).
+6. **Same email again**  
+   Signing up twice with an existing address may not send another confirmation; use **password reset** or delete the user in **Authentication** → **Users** for testing.

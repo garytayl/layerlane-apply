@@ -27,7 +27,7 @@ Personal job search assistant: a small **dashboard** (source of truth for experi
    - `http://127.0.0.1:3000/auth/callback` (optional)
    - Production: `https://layerlane-apply.vercel.app/auth/callback`  
    If `http://localhost:3000/auth/callback` is missing, Supabase may send users to `/` with `?code=` instead; the app forwards that to `/auth/callback`, but allowlisting is still recommended.
-5. Optional: replace the default **Confirm signup** email HTML in **Authentication → Email Templates** with the branded template in [`supabase/templates/confirm_signup.html`](supabase/templates/confirm_signup.html) (see [`supabase/templates/README.md`](supabase/templates/README.md)).
+5. Optional: replace the default **Confirm signup** email HTML in **Authentication → Email Templates** with the branded template in [`supabase/templates/confirm_signup.html`](supabase/templates/confirm_signup.html) (see [`supabase/templates/README.md`](supabase/templates/README.md)). If **no messages arrive**, read [Not receiving emails?](supabase/templates/README.md#not-receiving-emails) in that file (confirm-email setting, SMTP, spam, logs).
 
 ## 2. Web app (`apps/web`)
 
