@@ -34,7 +34,9 @@ Return ONLY valid JSON with this shape:
   ]
 }
 
-Pick at most 8 items for ranked_bullets. Prefer referencing existing bullet IDs from the bank when they apply; use bullet_id null only when proposing fresh wording.`;
+Pick at most 8 items for ranked_bullets. Prefer referencing existing bullet IDs from the bank when they apply; use bullet_id null only when proposing fresh wording.
+
+If the user message includes a "Candidate preferences" section (tone, target roles), align the summary and suggested bullets with that tone and those targets when relevant.`;
 
 /**
  * Normalize LLM JSON (already parsed as unknown) into a validated result.

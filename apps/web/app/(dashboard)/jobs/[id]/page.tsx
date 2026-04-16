@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { analyzeJobAction } from "../actions";
 import { AnalyzeButton } from "./analyze-button";
+import { JobPipelineForm } from "./job-pipeline-form";
 
 export default async function JobDetailPage({
   params,
@@ -55,6 +56,12 @@ export default async function JobDetailPage({
           </a>
         ) : null}
       </div>
+
+      <JobPipelineForm
+        jobId={id}
+        initialStatus={job.status ?? "saved"}
+        initialNotes={job.notes}
+      />
 
       <section>
         <h2 className="mb-2 text-sm font-medium uppercase tracking-wide text-muted-foreground">Analysis</h2>

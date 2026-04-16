@@ -55,12 +55,48 @@ export async function analyzeJobAction(jobId: string) {
     throw new Error("Job not found");
   }
 
-  await runJobAnalysis({
-    userId: user.id,
-    jobId: job.id,
-    rawJdText: job.raw_jd_text,
-  });
+  try {
+    await runJobAnalysis({
+      userId: user.id,
+      jobId: job.id,
+      rawJdText: job.raw_jd_text,
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "Analysis failed";
+    throw new Error(msg);
+  }
 
   revalidatePath(`/jobs/${jobId}`);
   revalidatePath("/jobs");
+}
+
+export async function updateJobPipeline(
+  _prev: { error?: string } | null,
+  formData: FormData,
+): Promise<{ error?: string }> {
+  const { supabase, user } = await requireUser();
+  const id = String(formData.get("job_id") ?? "");
+  if (!id) return { error: "Missing job" };
+
+  const status = String(formData.get("status") ?? "").trim() || "saved";
+  const notesRaw = formData.get("notes");
+  const notes = notesRaw === null || notesRaw === undefined ? null : String(notesRaw);
+
+  const { error } = await supabase
+    .from("jobs")
+    .update({
+      status,
+      notes,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath(`/jobs/${id}`);
+  revalidatePath("/jobs");
+  return {};
 }

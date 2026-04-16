@@ -39,6 +39,10 @@ export async function POST(
     return jsonWithCors(result);
   } catch (e) {
     const message = e instanceof Error ? e.message : "Analysis failed";
-    return jsonWithCors({ error: message }, { status: 500 });
+    const status =
+      message.includes("Daily analysis limit") || message.includes("quota")
+        ? 429
+        : 500;
+    return jsonWithCors({ error: message }, { status });
   }
 }

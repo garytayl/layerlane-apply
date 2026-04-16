@@ -4,9 +4,12 @@ import OpenAI from "openai";
 import {
   JOB_ANALYSIS_SYSTEM_PROMPT,
   formatEvidenceBankContext,
+  formatPreferenceContextForAnalysis,
   parseAnalysisResultFromLlmJson,
+  parseProfilePrefs,
   type AnalysisResult,
 } from "@layerlane/core";
+import { assertUnderDailyAnalysisLimit, incrementDailyAnalysisCount } from "@/lib/analysis-allowance";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type { AnalysisResult, RankedBullet } from "@layerlane/core";
@@ -16,9 +19,12 @@ export async function runJobAnalysis(params: {
   jobId: string;
   rawJdText: string;
 }): Promise<AnalysisResult & { model: string; raw_response: unknown }> {
+  await assertUnderDailyAnalysisLimit(params.userId);
+
   const admin = createAdminClient();
 
-  const [facts, bullets, receipts] = await Promise.all([
+  const [profileRes, facts, bullets, receipts, savedAnswers] = await Promise.all([
+    admin.from("profiles").select("prefs").eq("id", params.userId).maybeSingle(),
     admin
       .from("experience_facts")
       .select("id, body, company, title")
@@ -28,13 +34,36 @@ export async function runJobAnalysis(params: {
       .from("project_receipts")
       .select("id, name, problem, action, outcome, tech")
       .eq("user_id", params.userId),
+    admin
+      .from("saved_answers")
+      .select("id, prompt_type, title, body")
+      .eq("user_id", params.userId)
+      .order("created_at", { ascending: false })
+      .limit(40),
   ]);
+
+  const prefs = parseProfilePrefs(profileRes.data?.prefs);
+  const prefBlock = formatPreferenceContextForAnalysis(prefs);
 
   const bank = formatEvidenceBankContext({
     facts: facts.data ?? [],
     bullets: bullets.data ?? [],
     receipts: receipts.data ?? [],
+    saved_answers: (savedAnswers.data ?? []).map((r) => ({
+      id: r.id,
+      prompt_type: r.prompt_type,
+      title: r.title,
+      body: r.body,
+    })),
   });
+
+  const userBodyParts: string[] = [];
+  if (prefBlock) {
+    userBodyParts.push(prefBlock);
+  }
+  userBodyParts.push(`Evidence bank:\n${bank}`);
+  userBodyParts.push(`Job description:\n${params.rawJdText.slice(0, 32_000)}`);
+  const userContent = userBodyParts.join("\n\n");
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -54,7 +83,7 @@ export async function runJobAnalysis(params: {
       },
       {
         role: "user",
-        content: `Evidence bank:\n${bank}\n\nJob description:\n${params.rawJdText.slice(0, 32_000)}`,
+        content: userContent,
       },
     ],
   });
@@ -87,6 +116,8 @@ export async function runJobAnalysis(params: {
   if (error) {
     throw new Error(error.message);
   }
+
+  await incrementDailyAnalysisCount(params.userId);
 
   return { ...result, model, raw_response: parsedJson };
 }

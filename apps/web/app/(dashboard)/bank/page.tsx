@@ -53,7 +53,7 @@ export default async function BankPage() {
           Evidence bank
         </h1>
         <p className="text-sm text-muted-foreground">
-          Facts, bullets, and project stories power JD analysis and the extension.
+          Facts, bullets, and project stories power JD analysis and the extension. Tags are for your own organization only; they are not used in fit scoring.
         </p>
       </div>
 
@@ -181,7 +181,7 @@ export default async function BankPage() {
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-medium">Saved answers</h2>
         <p className="text-sm text-muted-foreground">
-          Reusable blurbs for common prompts (cover letter snippets, &quot;why us&quot;, etc.).
+          Reusable blurbs fed into job analysis (cover letter snippets, &quot;why us&quot;, etc.).
         </p>
         <form action={insertSavedAnswer} className={`grid gap-2 ${fieldCardClass}`}>
           <input name="prompt_type" placeholder="prompt type" className={fieldInputClass} />

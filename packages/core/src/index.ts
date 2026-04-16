@@ -12,3 +12,5 @@ export {
   profilePrefsSchema,
   type ProfilePrefs,
 } from "./profile";
+export { formatPreferenceContextForAnalysis } from "./preference-context";
+export type { SavedAnswerRow } from "./evidence-bank";

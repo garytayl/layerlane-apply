@@ -36,9 +36,12 @@ export default async function SettingsPage() {
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-medium">Preferences</h2>
+        <p className="text-xs text-muted-foreground">
+          These apply when you run <strong className="text-foreground">job analysis</strong> (summary and bullet suggestions).
+        </p>
         <form action={updatePrefs} className="flex flex-col gap-3">
           <label className="flex flex-col gap-1 text-sm text-foreground">
-            Default tone (for future prompts)
+            Default tone
             <input
               name="tone"
               defaultValue={prefs.tone ?? ""}
