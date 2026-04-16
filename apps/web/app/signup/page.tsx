@@ -107,12 +107,26 @@ export default async function SignupPage({
               rate limits, SMTP).
             </li>
           </ul>
-          <p className="mt-3 text-xs">
-            Check{" "}
-            <strong className="text-foreground">Supabase → Authentication → Logs</strong> for
-            mailer errors, and{" "}
-            <strong className="text-foreground">Project Settings → Auth</strong> if you use
-            custom SMTP.
+          <p className="mt-3 text-xs leading-relaxed">
+            In the Supabase dashboard: open{" "}
+            <strong className="text-foreground">Logs</strong> in the left sidebar →{" "}
+            <strong className="text-foreground">Auth</strong> (GoTrue / mailer errors). For
+            signup events, use{" "}
+            <strong className="text-foreground">Authentication</strong> →{" "}
+            <strong className="text-foreground">Audit Logs</strong> (under Configuration) —
+            look for <code className="text-foreground">user_confirmation_requested</code> or
+            errors. Custom SMTP:{" "}
+            <strong className="text-foreground">Project Settings → Authentication</strong>.
+            See{" "}
+            <a
+              className="text-primary underline underline-offset-2"
+              href="https://supabase.com/docs/guides/platform/logs"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Supabase logging docs
+            </a>
+            .
           </p>
         </div>
       </AuthPageShell>

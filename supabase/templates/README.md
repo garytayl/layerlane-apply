@@ -30,8 +30,10 @@ If you use `supabase start`, you can wire templates in `supabase/config.toml` wi
 1. **Confirm email is required**  
    In Supabase: **Authentication** → **Providers** → **Email**. If **Confirm email** is off, Supabase **does not send** a confirmation message — users are signed in immediately. The app now redirects straight to `/bank` when that happens.
 
-2. **Check Auth logs**  
-   **Authentication** → **Logs** (or **Project** → **Logs** → filter Auth). Look for mailer errors, rate limits, or SMTP failures.
+2. **Check logs (current dashboard)**  
+   - **Logs** (sidebar) → **Auth** — GoTrue server logs; search for mailer / SMTP / rate-limit errors.  
+   - **Authentication** → **Audit Logs** (under **Configuration**) — auth events (e.g. `user_confirmation_requested`, `user_signedup`).  
+   - Advanced: **Logs** → **Logs Explorer** — query the `auth_logs` source ([logging docs](https://supabase.com/docs/guides/platform/logs)).
 
 3. **Spam / Promotions**  
    Default Supabase sender addresses are easy for Gmail/Outlook to file under Spam until you use **custom SMTP** with your domain.
