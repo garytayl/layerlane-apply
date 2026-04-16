@@ -1,0 +1,29 @@
+/**
+ * Snapshot of layerlane-apply design tokens (see apps/web/app/globals.css for source of truth).
+ * Not bundled by the app — reference only.
+ */
+
+:root {
+  --background: oklch(0.985 0.002 90);
+  --foreground: oklch(0.12 0.01 60);
+  --primary: oklch(0.12 0.01 60);
+  --primary-foreground: oklch(0.985 0.002 90);
+  --muted: oklch(0.94 0.005 90);
+  --muted-foreground: oklch(0.45 0.02 60);
+  --border: oklch(0.88 0.01 90);
+  --input: oklch(0.92 0.01 90);
+  --ring: oklch(0.12 0.01 60);
+  --radius: 0.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.145 0.01 60);
+    --foreground: oklch(0.985 0.002 90);
+    --primary: oklch(0.985 0.002 90);
+    --primary-foreground: oklch(0.12 0.01 60);
+    --muted: oklch(0.269 0.01 60);
+    --muted-foreground: oklch(0.65 0.02 60);
+    --border: oklch(0.32 0.01 60);
+  }
+}

@@ -2,7 +2,8 @@
   "name": "layerlane-apply",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
     "build": "npm run build --workspace=web",

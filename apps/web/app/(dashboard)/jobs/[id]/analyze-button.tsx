@@ -19,7 +19,7 @@ export function AnalyzeButton({
     <form action={analyzeAction}>
       <button
         type="submit"
-        className="rounded border border-neutral-300 px-4 py-2 text-sm dark:border-neutral-600"
+        className="rounded-md border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent"
       >
         <PendingLabel hasAnalysis={hasAnalysis} />
       </button>

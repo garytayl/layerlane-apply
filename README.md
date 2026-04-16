@@ -7,6 +7,7 @@ Personal job search assistant: a small **dashboard** (source of truth for experi
 | Path | Purpose |
 |------|---------|
 | [apps/web](apps/web) | Next.js App Router app: auth, CRUD bank, jobs, analysis API, settings (API tokens) |
+| [packages/core](packages/core) | Shared TypeScript: Zod schemas, analysis prompt/parsing, evidence-bank formatting (for future mobile) |
 | [extension](extension) | Chrome extension (MV3): capture page text, call the web API with Bearer token |
 | [supabase/migrations](supabase/migrations) | Postgres schema + RLS (apply in Supabase SQL or via Supabase CLI) |
 | [supabase/templates](supabase/templates) | Branded **Confirm signup** HTML for Supabase Auth (paste in Dashboard) |

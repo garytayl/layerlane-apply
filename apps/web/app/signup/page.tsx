@@ -29,10 +29,9 @@ function MailIcon() {
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; check_email?: string; msg?: string }>;
+  searchParams: Promise<{ error?: string; check_email?: string }>;
 }) {
   const sp = await searchParams;
-  const errMsg = typeof sp.msg === "string" ? sp.msg : undefined;
 
   if (sp.check_email) {
     return (
@@ -47,10 +46,10 @@ export default async function SignupPage({
           </>
         }
         footer={
-          <p className="text-center text-sm text-neutral-600 dark:text-neutral-400">
+          <p className="text-center text-sm text-muted-foreground">
             <Link
               href="/login"
-              className="font-medium text-neutral-900 underline decoration-neutral-400 underline-offset-4 transition hover:decoration-neutral-900 dark:text-neutral-100 dark:decoration-neutral-600 dark:hover:decoration-neutral-100"
+              className="font-medium text-primary underline decoration-primary/40 underline-offset-4 transition hover:decoration-primary"
             >
               Back to sign in
             </Link>
@@ -61,7 +60,7 @@ export default async function SignupPage({
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/12 ring-1 ring-emerald-600/20 dark:bg-emerald-400/10 dark:ring-emerald-400/25">
             <MailIcon />
           </div>
-          <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+          <p className="text-sm leading-relaxed text-muted-foreground">
             The confirmation link expires after a while. If it does, request a new
             one by signing up again with the same email.
           </p>
@@ -76,11 +75,11 @@ export default async function SignupPage({
       title="Start tracking roles with context"
       description="Use your evidence bank and job analyses from the dashboard or the browser extension."
       footer={
-        <p className="text-center text-sm text-neutral-600 dark:text-neutral-400">
+        <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-medium text-neutral-900 underline decoration-neutral-400 underline-offset-4 transition hover:decoration-neutral-900 dark:text-neutral-100 dark:decoration-neutral-600 dark:hover:decoration-neutral-100"
+            className="font-medium text-primary underline decoration-primary/40 underline-offset-4 transition hover:decoration-primary"
           >
             Sign in
           </Link>
@@ -110,23 +109,17 @@ export default async function SignupPage({
             autoComplete="new-password"
             placeholder="At least 6 characters"
           />
-          <p className="mt-1.5 text-xs text-neutral-500 dark:text-neutral-500">
+          <p className="mt-1.5 text-xs text-muted-foreground">
             Choose a strong password you do not reuse elsewhere.
           </p>
         </div>
         {sp.error ? (
           <div
-            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-200"
+            className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
             role="alert"
           >
-            {errMsg ? (
-              <span className="whitespace-pre-wrap">{errMsg}</span>
-            ) : (
-              <>
-                We could not create your account. Try again, or sign in if you
-                already registered.
-              </>
-            )}
+            We could not create your account. Try again, or sign in if you
+            already registered.
           </div>
         ) : null}
         <AuthSubmitButton>Create account</AuthSubmitButton>

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 type AuthPageShellProps = {
   eyebrow?: string;
@@ -16,34 +17,37 @@ export function AuthPageShell({
   footer,
 }: AuthPageShellProps) {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#f6f5f2] via-[#f0eeea] to-[#e8e5df] dark:from-neutral-950 dark:via-[#0c0c0c] dark:to-black">
+    <div className="relative min-h-screen overflow-hidden bg-background noise-overlay">
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-15%,rgba(90,88,82,0.12),transparent)] dark:bg-[radial-gradient(ellipse_90%_60%_at_50%_-15%,rgba(255,255,255,0.05),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-15%,oklch(0.5_0.02_60/0.08),transparent)] dark:bg-[radial-gradient(ellipse_90%_60%_at_50%_-15%,oklch(0.9_0.02_60/0.06),transparent)]"
         aria-hidden
       />
-      <div className="relative mx-auto flex min-h-screen max-w-[440px] flex-col justify-center px-4 py-14 sm:px-6">
-        <div className="rounded-2xl border border-neutral-200/90 bg-white/95 p-8 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.08)] backdrop-blur-md dark:border-neutral-800/90 dark:bg-neutral-950/95 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)]">
+      <div className="relative z-[2] mx-auto flex min-h-screen max-w-[440px] flex-col justify-center px-4 py-14 sm:px-6">
+        <div
+          className={cn(
+            "rounded-2xl border border-border bg-card/95 p-8 shadow-lg shadow-foreground/5 backdrop-blur-md",
+            "dark:shadow-foreground/10",
+          )}
+        >
           {eyebrow ? (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-500">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               {eyebrow}
             </p>
           ) : null}
-          <h1 className="mt-2 text-[1.75rem] font-semibold leading-tight tracking-tight text-neutral-900 dark:text-neutral-50">
+          <h1 className="font-display mt-2 text-[1.75rem] leading-tight tracking-tight text-foreground">
             {title}
           </h1>
           {description ? (
-            <div className="mt-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+            <div className="mt-3 text-sm leading-relaxed text-muted-foreground">
               {description}
             </div>
           ) : null}
           <div className="mt-8">{children}</div>
           {footer ? (
-            <div className="mt-8 border-t border-neutral-200/90 pt-6 dark:border-neutral-800/90">
-              {footer}
-            </div>
+            <div className="mt-8 border-t border-border pt-6">{footer}</div>
           ) : null}
         </div>
-        <p className="mt-8 text-center text-[13px] text-neutral-500 dark:text-neutral-500">
+        <p className="mt-8 text-center text-[13px] text-muted-foreground">
           layerlane-apply
         </p>
       </div>
@@ -51,11 +55,14 @@ export function AuthPageShell({
   );
 }
 
-const inputClassName =
-  "w-full rounded-lg border border-neutral-300 bg-white px-4 py-2.5 text-[15px] text-neutral-900 shadow-sm outline-none transition placeholder:text-neutral-400 focus:border-neutral-800 focus:ring-2 focus:ring-neutral-900/10 dark:border-neutral-600 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-neutral-400 dark:focus:ring-neutral-100/10";
+const inputClassName = cn(
+  "w-full rounded-lg border border-input bg-background px-4 py-2.5 text-[15px] text-foreground shadow-sm outline-none transition",
+  "placeholder:text-muted-foreground",
+  "focus:border-ring focus:ring-2 focus:ring-ring/30",
+);
 
 const labelClassName =
-  "flex flex-col gap-1.5 text-[13px] font-medium text-neutral-700 dark:text-neutral-300";
+  "flex flex-col gap-1.5 text-[13px] font-medium text-foreground";
 
 export function AuthFieldLabel({
   children,
@@ -78,7 +85,7 @@ export function AuthInput({
   return (
     <input
       {...props}
-      className={[inputClassName, className].filter(Boolean).join(" ")}
+      className={cn(inputClassName, className)}
     />
   );
 }
@@ -91,7 +98,7 @@ export function AuthSubmitButton({
   return (
     <button
       type="submit"
-      className="w-full rounded-lg bg-neutral-900 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-neutral-800 active:scale-[0.995] dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-white"
+      className="w-full rounded-lg bg-primary py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 active:scale-[0.995]"
     >
       {children}
     </button>
