@@ -26,14 +26,33 @@ function MailIcon() {
   );
 }
 
+function decodeReason(raw: string | undefined): string | null {
+  if (!raw) return null;
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
 export default async function SignupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; check_email?: string }>;
+  searchParams: Promise<{
+    error?: string;
+    check_email?: string;
+    reason?: string;
+    api_ok?: string;
+    email_hint?: string;
+  }>;
 }) {
   const sp = await searchParams;
+  const errorDetail = decodeReason(sp.reason);
 
   if (sp.check_email) {
+    const apiOk = sp.api_ok === "1";
+    const emailHint = sp.email_hint ? decodeReason(sp.email_hint) : null;
+
     return (
       <AuthPageShell
         eyebrow="Almost there"
@@ -63,6 +82,37 @@ export default async function SignupPage({
           <p className="text-sm leading-relaxed text-muted-foreground">
             The confirmation link expires after a while. If it does, request a new
             one by signing up again with the same email.
+          </p>
+        </div>
+
+        <div className="mt-6 rounded-lg border border-border bg-muted/40 p-4 text-left text-sm text-muted-foreground">
+          <p className="font-medium text-foreground">What we know from the app</p>
+          <ul className="mt-2 list-inside list-disc space-y-1">
+            <li>
+              Sign-up request to Supabase:{" "}
+              <span className="font-medium text-foreground">
+                {apiOk ? "succeeded (no API error)" : "unknown — try signing up again"}
+              </span>
+              .
+            </li>
+            {emailHint ? (
+              <li>
+                Address used: <span className="font-mono text-foreground">{emailHint}</span>
+              </li>
+            ) : null}
+            <li>
+              The confirmation email is sent by{" "}
+              <strong className="text-foreground">Supabase Auth</strong>, not this Next.js
+              app. If the step above succeeded, delivery is on Supabase/email provider (spam,
+              rate limits, SMTP).
+            </li>
+          </ul>
+          <p className="mt-3 text-xs">
+            Check{" "}
+            <strong className="text-foreground">Supabase → Authentication → Logs</strong> for
+            mailer errors, and{" "}
+            <strong className="text-foreground">Project Settings → Auth</strong> if you use
+            custom SMTP.
           </p>
         </div>
       </AuthPageShell>
@@ -118,8 +168,16 @@ export default async function SignupPage({
             className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
             role="alert"
           >
-            We could not create your account. Try again, or sign in if you
-            already registered.
+            <p className="font-medium">Could not create your account</p>
+            {errorDetail ? (
+              <p className="mt-1 whitespace-pre-wrap break-words text-destructive/95">
+                {errorDetail}
+              </p>
+            ) : (
+              <p className="mt-1">
+                Try again, or sign in if you already registered.
+              </p>
+            )}
           </div>
         ) : null}
         <AuthSubmitButton>Create account</AuthSubmitButton>

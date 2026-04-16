@@ -7,13 +7,23 @@ import {
 } from "@/components/auth-page-shell";
 import { login } from "./actions";
 
+function decodeReason(raw: string | undefined): string | null {
+  if (!raw) return null;
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; error?: string }>;
+  searchParams: Promise<{ next?: string; error?: string; reason?: string }>;
 }) {
   const sp = await searchParams;
   const next = sp.next ?? "/bank";
+  const errorDetail = decodeReason(sp.reason);
 
   return (
     <AuthPageShell
@@ -61,8 +71,16 @@ export default async function LoginPage({
             className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
             role="alert"
           >
-            Those credentials did not work. Check your email and password, or
-            create an account.
+            <p className="font-medium">Sign in failed</p>
+            {errorDetail ? (
+              <p className="mt-1 whitespace-pre-wrap break-words text-destructive/95">
+                {errorDetail}
+              </p>
+            ) : (
+              <p className="mt-1">
+                Check your email and password, or create an account.
+              </p>
+            )}
           </div>
         ) : null}
         <AuthSubmitButton>Sign in</AuthSubmitButton>
