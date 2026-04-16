@@ -31,6 +31,25 @@ Personal job search assistant: a small **dashboard** (source of truth for experi
    If `http://localhost:3000/auth/callback` is missing, Supabase may send users to `/` with `?code=` instead; the app forwards that to `/auth/callback`, but allowlisting is still recommended.
 5. Optional: replace the default **Confirm signup** email HTML in **Authentication → Email Templates** with the branded template in [`supabase/templates/confirm_signup.html`](supabase/templates/confirm_signup.html) (see [`supabase/templates/README.md`](supabase/templates/README.md)). If **no messages arrive**, read [Not receiving emails?](supabase/templates/README.md#not-receiving-emails) in that file (confirm-email setting, SMTP, spam, logs).
 
+### Sign-up email: skip the inbox (recommended for solo / dev)
+
+Supabase sends confirmation mail, not this app. If you **don’t care about inbox verification**:
+
+1. Dashboard → **Authentication** → **Sign In / Providers** → open the **Email** provider.
+2. Turn **off** **Confirm email** (wording may vary slightly) and **Save**.  
+   New sign-ups get a session immediately; this app redirects them to `/bank` when `signUp` returns a session.  
+   Official detail: [Auth general configuration — Confirm email](https://supabase.com/docs/guides/auth/general-configuration).
+
+**Users created while Confirm email was on** may still be stuck unconfirmed. Fix: **Authentication → Users** → select the user → confirm manually if the UI offers it, or sign up again with a different email after disabling confirmation.
+
+### Sign-up email: still not arriving (if you keep Confirm email on)
+
+- Spam / Promotions folder  
+- **Authentication** → **SMTP** (custom sender): misconfigured SMTP blocks delivery  
+- Free-tier / shared mailer **rate limits** ([platform docs](https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits))  
+- **Logs → Auth** for GoTrue errors; **Authentication → Audit Logs** for `user_confirmation_requested`  
+- Same email signed up twice: may not resend; use password reset or a test address  
+
 ## 2. Web app (`apps/web`)
 
 Copy environment variables. Templates: [`.env.example`](.env.example) (repo root) and [`apps/web/.env.example`](apps/web/.env.example) (same keys).

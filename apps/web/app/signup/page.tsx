@@ -128,6 +128,32 @@ export default async function SignupPage({
             </a>
             .
           </p>
+
+          <div className="mt-4 rounded-lg border border-primary/25 bg-primary/5 p-3 text-xs leading-relaxed text-foreground">
+            <p className="font-medium">Skip email confirmation entirely</p>
+            <ol className="mt-2 list-decimal space-y-1 pl-4 text-muted-foreground">
+              <li>
+                Supabase Dashboard → <strong className="text-foreground">Authentication</strong>{" "}
+                → <strong className="text-foreground">Sign In / Providers</strong> →{" "}
+                <strong className="text-foreground">Email</strong>
+              </li>
+              <li>
+                Turn <strong className="text-foreground">Confirm email</strong> off → Save
+              </li>
+              <li>
+                Sign up again — you should land in the app with no inbox step (
+                <a
+                  className="text-primary underline underline-offset-2"
+                  href="https://supabase.com/docs/guides/auth/general-configuration"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  docs
+                </a>
+                ).
+              </li>
+            </ol>
+          </div>
         </div>
       </AuthPageShell>
     );

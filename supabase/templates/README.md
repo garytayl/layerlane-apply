@@ -1,5 +1,9 @@
 # Auth email templates (Supabase)
 
+**Don’t need inbox confirmation?** Turn off **Confirm email** under **Authentication → Sign In / Providers → Email** ([general configuration](https://supabase.com/docs/guides/auth/general-configuration)) — then new users skip the confirm step. See the main [README](../../README.md) “Sign-up email” section.
+
+---
+
 Supabase sends **Confirm signup**, **Magic link**, **Reset password**, etc. Those bodies are edited in the **Supabase Dashboard** (or via [Management API](https://supabase.com/docs/guides/auth/auth-email-templates)), not in the Next.js app.
 
 ## Confirm signup (this repo)
