@@ -1,6 +1,29 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
+const KIND_LABEL: Record<string, string> = {
+  resume: "Resume",
+  paste: "Paste",
+  cover_letter: "Cover letter",
+  linkedin: "LinkedIn / about",
+  referral: "Referral",
+  portfolio: "Portfolio",
+  other: "Other",
+};
+
+function statusStyle(status: string): string {
+  switch (status) {
+    case "ready":
+      return "bg-emerald-500/15 text-emerald-800 dark:text-emerald-200";
+    case "failed":
+      return "bg-destructive/15 text-destructive";
+    case "running":
+      return "bg-amber-500/15 text-amber-900 dark:text-amber-100";
+    default:
+      return "bg-muted text-muted-foreground";
+  }
+}
+
 export default async function SourcesPage() {
   const supabase = await createClient();
   const {
@@ -36,12 +59,32 @@ export default async function SourcesPage() {
           <li key={d.id}>
             <Link
               href={`/sources/${d.id}`}
-              className="flex flex-wrap items-baseline justify-between gap-2 rounded-lg border border-border px-3 py-2 transition hover:bg-accent/50"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border px-4 py-3 transition hover:bg-accent/50"
             >
-              <span className="font-medium text-foreground">{d.title ?? "Untitled"}</span>
-              <span className="text-xs text-muted-foreground">
-                {d.kind} · {d.extraction_status}
-              </span>
+              <div className="min-w-0 flex-1">
+                <span className="block truncate font-medium text-foreground">{d.title ?? "Untitled"}</span>
+                <time
+                  className="mt-0.5 block text-xs text-muted-foreground"
+                  dateTime={d.created_at ?? undefined}
+                >
+                  {d.created_at
+                    ? new Date(d.created_at).toLocaleString(undefined, {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })
+                    : ""}
+                </time>
+              </div>
+              <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+                <span className="rounded-full border border-border bg-background px-2.5 py-0.5 text-xs font-medium text-foreground">
+                  {KIND_LABEL[d.kind] ?? d.kind}
+                </span>
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${statusStyle(d.extraction_status)}`}
+                >
+                  {d.extraction_status}
+                </span>
+              </div>
             </Link>
           </li>
         ))}

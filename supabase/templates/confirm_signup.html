@@ -153,18 +153,128 @@
                 >
                   Or enter this one-time code:
                 </p>
-                <p
+                <div
                   style="
                     margin: 0 0 28px;
-                    font-size: 24px;
-                    font-weight: 600;
-                    letter-spacing: 0.35em;
-                    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-                    color: #0c0a09;
+                    padding: 16px 18px;
+                    border-radius: 12px;
+                    background-color: #fafaf9;
+                    border: 1px solid rgba(28, 25, 23, 0.08);
                   "
                 >
-                  {{ .Token }}
-                </p>
+                  <p
+                    style="
+                      margin: 0 0 10px;
+                      font-size: 11px;
+                      font-weight: 600;
+                      letter-spacing: 0.14em;
+                      text-transform: uppercase;
+                      color: #78716c;
+                    "
+                  >
+                    One-time code
+                  </p>
+                  <p
+                    style="
+                      margin: 0;
+                      font-size: 26px;
+                      font-weight: 600;
+                      letter-spacing: 0.28em;
+                      line-height: 1.35;
+                      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                      color: #0c0a09;
+                      word-break: break-all;
+                    "
+                  >
+                    {{ .Token }}
+                  </p>
+                </div>
+
+                <!--
+                  CSB = Christian Standard Bible (Holman). Short quotations in email may require permission;
+                  linking to YouVersion uses CSB without hosting text in this template.
+                  To paste your own multi-line verse HTML in the Supabase editor, use <br /> between lines
+                  inside the blockquote-style paragraph below.
+                -->
+                <div
+                  style="
+                    margin: 0 0 28px;
+                    padding: 20px 18px;
+                    border-radius: 14px;
+                    background: linear-gradient(165deg, #fafaf9 0%, #f5f5f4 100%);
+                    border: 1px solid rgba(28, 25, 23, 0.07);
+                  "
+                >
+                  <p
+                    style="
+                      margin: 0 0 10px;
+                      font-size: 11px;
+                      font-weight: 600;
+                      letter-spacing: 0.14em;
+                      text-transform: uppercase;
+                      color: #78716c;
+                    "
+                  >
+                    Encouragement
+                  </p>
+                  <p
+                    style="
+                      margin: 0 0 14px;
+                      font-size: 14px;
+                      line-height: 1.65;
+                      color: #57534e;
+                    "
+                  >
+                    Take a breath—then open God’s Word in the
+                    <strong style="color: #44403c">Christian Standard Bible (CSB)</strong>
+                    on YouVersion. No API key is required to read or share passages via link.
+                  </p>
+                  <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 0 0 12px; width: 100%">
+                    <tr>
+                      <td style="padding: 0 0 8px; border-bottom: 1px solid rgba(28, 25, 23, 0.08)">
+                        <a
+                          href="https://www.bible.com/bible/1713/JHN.3.16"
+                          style="
+                            display: block;
+                            font-size: 15px;
+                            font-weight: 600;
+                            line-height: 1.45;
+                            color: #0c0a09;
+                            text-decoration: none;
+                          "
+                          >John 3:16 · read in CSB</a
+                        >
+                        <span style="font-size: 12px; color: #78716c">YouVersion · version ID 1713</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 10px 0 0">
+                        <a
+                          href="https://www.bible.com/bible/1713/PSA.23"
+                          style="
+                            display: block;
+                            font-size: 15px;
+                            font-weight: 600;
+                            line-height: 1.45;
+                            color: #0c0a09;
+                            text-decoration: none;
+                          "
+                          >Psalm 23 · read in CSB</a
+                        >
+                        <span style="font-size: 12px; color: #78716c">Chapter links work the same pattern</span>
+                      </td>
+                    </tr>
+                  </table>
+                  <p style="margin: 0; font-size: 11px; line-height: 1.5; color: #a8a29e">
+                    Programmatic access: see
+                    <a href="https://scripture.api.bible/" style="color: #78716c; text-decoration: underline"
+                      >API.Bible</a
+                    >
+                    (licensed keys; CSB available per plan). For pasted HTML verses here, follow Holman’s CSB
+                    permissions at
+                    <a href="https://csbible.com/" style="color: #78716c; text-decoration: underline">csbible.com</a>.
+                  </p>
+                </div>
 
                 <p
                   style="

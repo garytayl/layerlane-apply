@@ -62,10 +62,8 @@ export default async function ProfilePage() {
           </p>
         ) : null}
         {profile?.candidate_summary ? (
-          <div className="space-y-3 text-sm leading-relaxed text-foreground">
-            {profile.candidate_summary.split("\n\n").map((para: string, i: number) => (
-              <p key={i}>{para}</p>
-            ))}
+          <div className="max-w-prose rounded-lg border border-border/80 bg-muted/30 px-4 py-5 text-[15px] leading-[1.75] text-foreground">
+            <div className="whitespace-pre-line">{profile.candidate_summary}</div>
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">
@@ -77,38 +75,63 @@ export default async function ProfilePage() {
       {syn.success && Object.keys(syn.data).length > 0 ? (
         <section className="flex flex-col gap-4">
           <h2 className="text-lg font-medium">Structured synthesis</h2>
-          <div className="grid gap-4 text-sm">
+          <div className="grid gap-5 text-sm leading-relaxed">
             {syn.data.role_clusters && syn.data.role_clusters.length > 0 ? (
-              <div>
-                <h3 className="font-medium text-muted-foreground">Role clusters</h3>
-                <p>{syn.data.role_clusters.join(" · ")}</p>
+              <div className="rounded-lg border border-border/80 bg-card/50 px-4 py-3">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Role clusters
+                </h3>
+                <p className="text-foreground">{syn.data.role_clusters.join(" · ")}</p>
               </div>
             ) : null}
             {syn.data.strengths && syn.data.strengths.length > 0 ? (
-              <div>
-                <h3 className="font-medium text-muted-foreground">Strengths</h3>
-                <ul className="list-inside list-disc">
+              <div className="rounded-lg border border-border/80 bg-card/50 px-4 py-3">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Strengths
+                </h3>
+                <ul className="list-none space-y-2 pl-0">
                   {syn.data.strengths.map((s) => (
-                    <li key={s}>{s}</li>
+                    <li key={s} className="flex gap-2 text-foreground">
+                      <span className="select-none text-muted-foreground" aria-hidden>
+                        ·
+                      </span>
+                      <span>{s}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
             ) : null}
             {syn.data.positioning ? (
-              <div>
-                <h3 className="font-medium text-muted-foreground">Positioning</h3>
-                <p className="whitespace-pre-wrap">{syn.data.positioning}</p>
+              <div className="rounded-lg border border-border/80 bg-card/50 px-4 py-3">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Positioning
+                </h3>
+                <p className="whitespace-pre-line text-foreground">{syn.data.positioning}</p>
               </div>
             ) : null}
             {syn.data.evidence_themes && syn.data.evidence_themes.length > 0 ? (
-              <div>
-                <h3 className="font-medium text-muted-foreground">Evidence-backed themes</h3>
-                <ul className="flex flex-col gap-2">
+              <div className="rounded-lg border border-border/80 bg-card/50 px-4 py-3">
+                <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Evidence-backed themes
+                </h3>
+                <ul className="flex flex-col gap-4">
                   {syn.data.evidence_themes.map((t) => (
-                    <li key={t.theme}>
-                      <span className="font-medium">{t.theme}</span>
+                    <li
+                      key={t.theme}
+                      className="border-l-2 border-primary/35 pl-4 text-foreground"
+                    >
+                      <p className="font-medium text-foreground">{t.theme}</p>
                       {t.supports?.length ? (
-                        <span className="text-muted-foreground"> — {t.supports.join("; ")}</span>
+                        <ul className="mt-2 list-none space-y-1.5 text-sm text-muted-foreground">
+                          {t.supports.map((x) => (
+                            <li key={x} className="flex gap-2">
+                              <span className="text-primary/60" aria-hidden>
+                                —
+                              </span>
+                              <span>{x}</span>
+                            </li>
+                          ))}
+                        </ul>
                       ) : null}
                     </li>
                   ))}
@@ -116,19 +139,28 @@ export default async function ProfilePage() {
               </div>
             ) : null}
             {syn.data.portfolio_highlights && syn.data.portfolio_highlights.length > 0 ? (
-              <div>
-                <h3 className="font-medium text-muted-foreground">Portfolio highlights</h3>
-                <ul className="list-inside list-disc">
+              <div className="rounded-lg border border-border/80 bg-card/50 px-4 py-3">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Portfolio highlights
+                </h3>
+                <ul className="list-none space-y-2">
                   {syn.data.portfolio_highlights.map((p) => (
-                    <li key={p}>{p}</li>
+                    <li key={p} className="flex gap-2 text-foreground">
+                      <span className="text-muted-foreground" aria-hidden>
+                        ◆
+                      </span>
+                      <span>{p}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
             ) : null}
             {syn.data.voice_notes ? (
-              <div>
-                <h3 className="font-medium text-muted-foreground">Voice</h3>
-                <p className="whitespace-pre-wrap">{syn.data.voice_notes}</p>
+              <div className="rounded-lg border border-border/80 bg-card/50 px-4 py-3">
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Voice
+                </h3>
+                <p className="whitespace-pre-line italic text-foreground/90">{syn.data.voice_notes}</p>
               </div>
             ) : null}
           </div>
