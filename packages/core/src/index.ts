@@ -14,3 +14,17 @@ export {
 } from "./profile";
 export { formatPreferenceContextForAnalysis } from "./preference-context";
 export type { SavedAnswerRow } from "./evidence-bank";
+export {
+  SOURCE_EXTRACTION_SYSTEM_PROMPT,
+  parseSourceExtractionFromLlmJson,
+  sourceExtractionResultSchema,
+  type SourceExtractionResult,
+} from "./source-extraction";
+export {
+  PROFILE_SYNTHESIS_SYSTEM_PROMPT,
+  candidateSynthesisSchema,
+  parseProfileSynthesisFromLlmJson,
+  type CandidateSynthesis,
+  type ProfileSynthesisLlmResult,
+} from "./profile-synthesis";
+export { chunkSourceText } from "./text-chunk";

@@ -5,6 +5,7 @@ import {
   listItemCardClass,
   primaryButtonClass,
 } from "@/lib/form-classes";
+import Link from "next/link";
 import {
   deleteBullet,
   deleteExperienceFact,
@@ -30,18 +31,22 @@ export default async function BankPage() {
   const [facts, bullets, receipts, answers] = await Promise.all([
     supabase
       .from("experience_facts")
-      .select("*")
+      .select("id, user_id, company, title, body, start_date, end_date, tags, created_at, updated_at, source_document_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
-    supabase.from("bullets").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+    supabase
+      .from("bullets")
+      .select("id, user_id, body, category, tags, created_at, updated_at, source_document_id")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
     supabase
       .from("project_receipts")
-      .select("*")
+      .select("id, user_id, name, problem, action, outcome, tech, tags, created_at, updated_at, source_document_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
     supabase
       .from("saved_answers")
-      .select("*")
+      .select("id, user_id, prompt_type, title, body, tags, created_at, updated_at, source_document_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
   ]);
@@ -53,7 +58,12 @@ export default async function BankPage() {
           Evidence bank
         </h1>
         <p className="text-sm text-muted-foreground">
-          Facts, bullets, and project stories power JD analysis and the extension. Tags are for your own organization only; they are not used in fit scoring.
+          Facts, bullets, and project stories power JD analysis and the extension.           Import{" "}
+          <Link href="/sources/new" className="text-primary underline underline-offset-4">
+            sources
+          </Link>{" "}
+          to extract structured rows with traceability. Tags are for your own organization only; they are not used in
+          fit scoring.
         </p>
       </div>
 
@@ -95,6 +105,13 @@ export default async function BankPage() {
                   </button>
                 </div>
               </form>
+              {"source_document_id" in row && row.source_document_id ? (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  <Link href={`/sources/${row.source_document_id}`} className="text-primary underline">
+                    Trace: source document
+                  </Link>
+                </p>
+              ) : null}
               <form action={deleteExperienceFact} className="mt-2">
                 <input type="hidden" name="id" value={row.id} />
                 <button type="submit" className="text-sm text-destructive hover:underline">
@@ -128,6 +145,13 @@ export default async function BankPage() {
                   Save
                 </button>
               </form>
+              {"source_document_id" in row && row.source_document_id ? (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  <Link href={`/sources/${row.source_document_id}`} className="text-primary underline">
+                    Trace: source document
+                  </Link>
+                </p>
+              ) : null}
               <form action={deleteBullet}>
                 <input type="hidden" name="id" value={row.id} />
                 <button type="submit" className="text-sm text-destructive hover:underline">
@@ -167,6 +191,13 @@ export default async function BankPage() {
                   Save
                 </button>
               </form>
+              {"source_document_id" in row && row.source_document_id ? (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  <Link href={`/sources/${row.source_document_id}`} className="text-primary underline">
+                    Trace: source document
+                  </Link>
+                </p>
+              ) : null}
               <form action={deleteProjectReceipt}>
                 <input type="hidden" name="id" value={row.id} />
                 <button type="submit" className="text-sm text-destructive hover:underline">
@@ -205,6 +236,13 @@ export default async function BankPage() {
                   Save
                 </button>
               </form>
+              {"source_document_id" in row && row.source_document_id ? (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  <Link href={`/sources/${row.source_document_id}`} className="text-primary underline">
+                    Trace: source document
+                  </Link>
+                </p>
+              ) : null}
               <form action={deleteSavedAnswer}>
                 <input type="hidden" name="id" value={row.id} />
                 <button type="submit" className="text-sm text-destructive hover:underline">

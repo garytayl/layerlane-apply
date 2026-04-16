@@ -16,6 +16,18 @@ export async function Nav() {
         <div className="flex flex-wrap items-center gap-6 text-sm">
           <Link
             className="font-medium text-foreground transition-colors hover:text-foreground/80"
+            href="/profile"
+          >
+            Profile
+          </Link>
+          <Link
+            className="text-muted-foreground transition-colors hover:text-foreground"
+            href="/sources"
+          >
+            Sources
+          </Link>
+          <Link
+            className="text-muted-foreground transition-colors hover:text-foreground"
             href="/bank"
           >
             Bank

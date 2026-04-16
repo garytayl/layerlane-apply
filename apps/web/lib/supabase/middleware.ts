@@ -6,7 +6,9 @@ export async function updateSession(request: NextRequest) {
   const isProtected =
     path.startsWith("/bank") ||
     path.startsWith("/jobs") ||
-    path.startsWith("/settings");
+    path.startsWith("/settings") ||
+    path.startsWith("/profile") ||
+    path.startsWith("/sources");
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
@@ -58,7 +60,7 @@ export async function updateSession(request: NextRequest) {
     }
 
     if ((path === "/login" || path === "/signup") && user) {
-      return NextResponse.redirect(new URL("/bank", request.url));
+      return NextResponse.redirect(new URL("/profile", request.url));
     }
 
     return supabaseResponse;
