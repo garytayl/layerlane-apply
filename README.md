@@ -21,7 +21,8 @@ Personal job search assistant: a small **dashboard** (source of truth for experi
 ## 1. Database
 
 1. Create a Supabase project.
-2. Run the SQL in [`supabase/migrations/20250412130000_init.sql`](supabase/migrations/20250412130000_init.sql) in the Supabase SQL editor (or use `supabase db push` if you use the Supabase CLI linked to this project).
+2. Run the SQL in [`supabase/migrations/20250412130000_init.sql`](supabase/migrations/20250412130000_init.sql) in the Supabase SQL editor (or use `supabase db push` if you use the Supabase CLI linked to this project).  
+   **If you see `relation "profiles" already exists`**, your schema was applied already—check **Table Editor** for `jobs`, `job_analyses`, `api_tokens`, etc. If anything is missing, run [`20250412130000_init_idempotent.sql`](supabase/migrations/20250412130000_init_idempotent.sql) instead (safe to re-run; creates missing tables and refreshes policies).
 3. In **Authentication → Providers**, enable **Email** (password or magic link as you prefer).
 4. Under **Authentication → URL Configuration**, set **Site URL** to your app origin (e.g. `http://localhost:3000` locally, or production below) and add these to **Redirect URLs** so confirmation and OAuth work:
    - `http://localhost:3000/auth/callback`
