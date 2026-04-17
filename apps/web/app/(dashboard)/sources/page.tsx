@@ -1,15 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-
-const KIND_LABEL: Record<string, string> = {
-  resume: "Resume",
-  paste: "Paste",
-  cover_letter: "Cover letter",
-  linkedin: "LinkedIn / about",
-  referral: "Referral",
-  portfolio: "Portfolio",
-  other: "Other",
-};
+import { labelSourceKind } from "./kinds";
 
 function statusStyle(status: string): string {
   switch (status) {
@@ -77,7 +68,7 @@ export default async function SourcesPage() {
               </div>
               <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                 <span className="rounded-full border border-border bg-background px-2.5 py-0.5 text-xs font-medium text-foreground">
-                  {KIND_LABEL[d.kind] ?? d.kind}
+                  {labelSourceKind(d.kind)}
                 </span>
                 <span
                   className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${statusStyle(d.extraction_status)}`}
