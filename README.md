@@ -81,6 +81,13 @@ This runs the Next app via `npm run dev --workspace=web`. You can still use `cd 
 
 Open [http://localhost:3000](http://localhost:3000). Sign up, open **Settings**, generate an **API token** for the extension, and seed the **Bank** before running analysis.
 
+### Local-only Career HQ ledger (no Supabase required)
+
+Run `npm install` and `npm run dev`, then open [http://localhost:3000/local-ledger](http://localhost:3000/local-ledger).
+The ledger uses embedded Postgres via PGlite and stores its files in `%LOCALAPPDATA%\CareerHQ\pglite` on Windows. It supports creating and editing canonical facts, attaching supporting or contradicting evidence, and recording verification decisions without auth, Docker, or a hosted backend.
+
+Set `CHQ_LOCAL_DATA_DIR` if you want the local database files stored somewhere else. Do not place that directory in source control or a shared folder.
+
 ### Deploying on Vercel
 
 The repo has a root [`package.json`](package.json) with `"workspaces": ["apps/*"]` and **direct** `next` / `react` / `react-dom` entries (same versions as `apps/web`) so Vercel’s detector finds Next.js at the repo root. Build runs via `npm run build` → `web` workspace. **Framework Preset:** Next.js. **Root Directory:** repository root (default).

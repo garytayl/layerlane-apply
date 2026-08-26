@@ -11,7 +11,7 @@
     "lint": "npm run lint --workspace=web"
   },
   "dependencies": {
-    "next": "15.5.15",
+    "next": "15.5.24",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
