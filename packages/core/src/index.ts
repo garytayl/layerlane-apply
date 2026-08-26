@@ -28,3 +28,17 @@ export {
   type ProfileSynthesisLlmResult,
 } from "./profile-synthesis";
 export { chunkSourceText } from "./text-chunk";
+export {
+  careerLedgerRecordKindSchema,
+  careerLedgerRecordSchema,
+  ledgerEvidenceSchema,
+  provenanceLocatorSchema,
+  verificationMethodSchema,
+  verificationStatusSchema,
+  type CareerLedgerRecord,
+  type CareerLedgerRecordKind,
+  type LedgerEvidence,
+  type ProvenanceLocator,
+  type VerificationMethod,
+  type VerificationStatus,
+} from "./career-ledger";

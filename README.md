@@ -11,6 +11,7 @@ Personal job search assistant: a small **dashboard** (source of truth for experi
 | [extension](extension) | Chrome extension (MV3): capture page text, call the web API with Bearer token |
 | [supabase/migrations](supabase/migrations) | Postgres schema + RLS (apply in Supabase SQL or via Supabase CLI) |
 | [supabase/templates](supabase/templates) | Branded **Confirm signup** HTML for Supabase Auth (paste in Dashboard) |
+| [docs/career-hq-ledger.md](docs/career-hq-ledger.md) | Career HQ Master Career Ledger, provenance, and verification architecture |
 
 ## Prerequisites
 
