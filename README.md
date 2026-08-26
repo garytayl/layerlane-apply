@@ -88,6 +88,8 @@ The ledger uses embedded Postgres via PGlite and stores its files in `%LOCALAPPD
 
 Set `CHQ_LOCAL_DATA_DIR` if you want the local database files stored somewhere else. Do not place that directory in source control or a shared folder.
 
+The UI and future ChatGPT integration share a typed service layer. See [`docs/chq-tool-api.md`](docs/chq-tool-api.md) for the authenticated local API contract and the future MCP bridge.
+
 ### Deploying on Vercel
 
 The repo has a root [`package.json`](package.json) with `"workspaces": ["apps/*"]` and **direct** `next` / `react` / `react-dom` entries (same versions as `apps/web`) so Vercel’s detector finds Next.js at the repo root. Build runs via `npm run build` → `web` workspace. **Framework Preset:** Next.js. **Root Directory:** repository root (default).

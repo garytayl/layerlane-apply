@@ -9,6 +9,7 @@ export const careerLedgerRecordKindSchema = z.enum([
   "achievement",
   "credential",
   "preference",
+  "claim",
 ]);
 
 export const verificationStatusSchema = z.enum([
@@ -51,6 +52,7 @@ export const careerLedgerRecordSchema = z.object({
   value: z.record(z.unknown()),
   verification_status: verificationStatusSchema,
   confidence: z.number().min(0).max(1),
+  needs_review: z.boolean(),
   valid_from: z.string().nullable(),
   valid_to: z.string().nullable(),
   last_verified_at: z.string().datetime().nullable(),
