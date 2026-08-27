@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import {
+  createClient,
+  isSupabaseConfigured,
+} from "@/lib/supabase/server";
 
 export default async function Home({
   searchParams,
@@ -16,6 +19,12 @@ export default async function Home({
     const next = typeof sp.next === "string" ? sp.next : undefined;
     if (next) qs.set("next", next);
     redirect(`/auth/callback?${qs.toString()}`);
+  }
+
+  // Career HQ is local-first. Supabase is optional during local development,
+  // so send an unconfigured installation directly to the local ledger.
+  if (!isSupabaseConfigured()) {
+    redirect("/local-ledger");
   }
 
   const supabase = await createClient();
