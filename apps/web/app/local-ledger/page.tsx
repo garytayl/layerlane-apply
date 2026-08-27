@@ -36,19 +36,17 @@ export default async function LocalLedgerPage() {
   const countKind = (kind: string) => records.filter((record) => record.kind === kind).length;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 py-10">
-      <header className="flex flex-col gap-2 border-b border-border pb-6">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-          Career HQ · local mode
-        </p>
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Master Career Ledger</h1>
-        <p className="max-w-2xl text-sm text-muted-foreground">
-          Stored only on this computer. No Supabase project, login, or cloud connection is required.
-        </p>
-        <div className="mt-3 flex flex-wrap gap-3 text-sm">
-          <Link href="/local-ledger/review" className={primaryButtonClass}>Review CHQ Inbox ({needsReview.inbox.length})</Link>
-          <Link href="/local-ledger/bridge" className="rounded border border-border px-3 py-2">Bridge diagnostics</Link>
-          <a href="/local-ledger/snapshot" className="rounded border border-border px-3 py-2">Export snapshot</a>
+    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
+      <header className="overflow-hidden rounded-3xl border border-primary/15 bg-card/90 shadow-xl shadow-primary/5">
+        <div className="grid gap-7 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div><div className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_0_5px] shadow-emerald-500/10" /><p className="text-xs font-bold uppercase tracking-[0.22em] text-primary">Career HQ · local canonical store</p></div>
+          <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight sm:text-5xl">Your career, with receipts.</h1>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">One durable ledger for experience, evidence, projects, and applications. Stored on this computer—not scattered across chats and résumés.</p></div>
+          <div className="flex flex-wrap gap-3 text-sm lg:justify-end">
+            <Link href="/local-ledger/review" className={primaryButtonClass}>Review inbox <span className="ml-1 rounded-full bg-primary-foreground/15 px-2 py-0.5">{needsReview.inbox.length}</span></Link>
+            <Link href="/local-ledger/bridge" className="rounded-xl border border-border bg-background/70 px-4 py-2.5 font-semibold transition hover:border-primary/40">Bridge status</Link>
+            <a href="/local-ledger/snapshot" className="rounded-xl border border-border bg-background/70 px-4 py-2.5 font-semibold transition hover:border-primary/40">Export</a>
+          </div>
         </div>
       </header>
 
@@ -61,9 +59,10 @@ export default async function LocalLedgerPage() {
           ["Claims", countKind("claim")],
           ["Needs Gary", needsReview.inbox.length + needsReview.ledger.length],
         ].map(([label, count]) => (
-          <div key={label} className={fieldCardClass}>
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="text-2xl font-semibold">{count}</p>
+          <div key={label} className={`${fieldCardClass} relative overflow-hidden`}>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight">{count}</p>
+            <span className="absolute -bottom-5 -right-5 h-16 w-16 rounded-full bg-primary/5" />
           </div>
         ))}
       </section>
@@ -77,7 +76,9 @@ export default async function LocalLedgerPage() {
         </section>
       ) : null}
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <details className="rounded-2xl border border-border/70 bg-card/60">
+        <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold">Sources and manual data entry <span className="font-normal text-muted-foreground">· {sources.length} stored sources</span></summary>
+      <section className="grid gap-6 border-t border-border/70 p-5 lg:grid-cols-2">
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-medium">Evidence sources</h2>
           <form action={ingestLocalSource} className={`grid gap-3 ${fieldCardClass}`}>
@@ -109,9 +110,8 @@ export default async function LocalLedgerPage() {
           )}
         </div>
       </section>
-
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-medium">Add a career fact</h2>
+      <section className="flex flex-col gap-4 border-t border-border/70 p-5">
+        <h2 className="text-lg font-semibold">Add a career fact manually</h2>
         <form action={createLocalLedgerRecord} className={`grid gap-3 ${fieldCardClass}`}>
           <div className="grid gap-3 sm:grid-cols-2">
             <select name="kind" className={fieldInputClass} defaultValue="experience">
@@ -124,11 +124,12 @@ export default async function LocalLedgerPage() {
           <button type="submit" className={primaryButtonClass}>Add to ledger</button>
         </form>
       </section>
+      </details>
 
       <section className="flex flex-col gap-5">
-        <div>
-          <h2 className="text-lg font-medium">Ledger records</h2>
-          <p className="text-sm text-muted-foreground">{records.length} canonical facts on this machine.</p>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Canonical data</p><h2 className="mt-1 text-2xl font-semibold tracking-tight">Ledger records</h2><p className="text-sm text-muted-foreground">{records.length} career facts on this machine.</p></div>
+          <p className="text-xs text-muted-foreground">Open a record only when you need to edit evidence or verification.</p>
         </div>
 
         {records.length === 0 ? (
@@ -136,14 +137,13 @@ export default async function LocalLedgerPage() {
             The ledger is empty. Add one fact above to exercise the complete local workflow.
           </p>
         ) : (
-          <ul className="flex flex-col gap-6">
+          <ul className="grid gap-5 xl:grid-cols-2">
             {records.map((record) => (
-              <li key={record.id} className={`${listItemCardClass} grid gap-5 bg-card/50`}>
+              <li key={record.id} className={`${listItemCardClass} grid content-start gap-4 bg-card/80`}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">{record.kind}</p>
-                    <h3 className="font-medium">{record.label}</h3>
-                    <code className="text-xs text-muted-foreground">{record.canonical_key}</code>
+                    <p className="text-xs font-bold uppercase tracking-wide text-primary">{record.kind}</p>
+                    <h3 className="mt-1 text-lg font-semibold tracking-tight">{record.label}</h3>
                   </div>
                   <span className="rounded-full border border-border px-2 py-1 text-xs">
                     {record.verification_status} · {Math.round(record.confidence * 100)}%
@@ -155,6 +155,12 @@ export default async function LocalLedgerPage() {
                   ) : null}
                 </div>
 
+                <p className="text-sm leading-6 text-muted-foreground">{record.summary}</p>
+                <div className="flex flex-wrap gap-2 text-xs text-muted-foreground"><span>{record.evidence.length} evidence item{record.evidence.length === 1 ? "" : "s"}</span><span>·</span><span>Updated {new Date(record.updated_at).toLocaleDateString()}</span></div>
+
+                <details className="rounded-xl border border-border/70 bg-muted/20">
+                <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-primary">Manage record <span aria-hidden="true">→</span></summary>
+                <div className="grid gap-5 border-t border-border/70 p-4">
                 <form action={updateLocalLedgerRecord} className="grid gap-2">
                   <input type="hidden" name="id" value={record.id} />
                   <div className="grid gap-2 sm:grid-cols-2">
@@ -171,7 +177,7 @@ export default async function LocalLedgerPage() {
                   <button type="submit" className="w-fit text-sm text-primary underline">Save fact</button>
                 </form>
 
-                <div className="grid gap-4 border-t border-border pt-4 md:grid-cols-2">
+                <div className="grid gap-4 border-t border-border pt-4">
                   <div className="grid gap-3">
                     <h4 className="text-sm font-medium">Evidence</h4>
                     {record.evidence.length > 0 ? (
@@ -231,6 +237,8 @@ export default async function LocalLedgerPage() {
                     ) : null}
                   </form>
                 </div>
+                </div>
+                </details>
               </li>
             ))}
           </ul>

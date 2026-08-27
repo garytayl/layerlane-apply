@@ -1,24 +1,30 @@
 import Link from "next/link";
 import { fieldCardClass, fieldInputClass, primaryButtonClass } from "@/lib/form-classes";
 import { listLocalInboxItems } from "@/lib/local-ledger";
-import { acceptInbox, importInboxFile, importInboxText, rejectInbox } from "./actions";
+import { importInboxFile, importInboxText } from "./actions";
+import { ReviewQueue } from "./review-queue";
 
 export const dynamic = "force-dynamic";
 
 export default async function NeedsReviewPage() {
   const items = await listLocalInboxItems();
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-4 py-10">
-      <header className="flex flex-col gap-2 border-b border-border pb-6">
-        <Link href="/local-ledger" className="text-sm text-primary underline">← Master Career Ledger</Link>
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">CHQ Inbox</p>
-        <h1 className="font-display text-3xl font-semibold tracking-tight">Needs Review</h1>
-        <p className="max-w-3xl text-sm text-muted-foreground">
+    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
+      <header className="overflow-hidden rounded-3xl border border-primary/15 bg-card/90 shadow-xl shadow-primary/5">
+        <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div><Link href="/local-ledger" className="text-sm font-semibold text-primary">← Master Career Ledger</Link>
+          <p className="mt-6 text-xs font-bold uppercase tracking-[0.22em] text-primary">CHQ Inbox · local approval only</p>
+          <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight sm:text-5xl">Needs Review</h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
           External updates stop here. Accept, correct, or reject each item before it can affect the canonical local ledger.
-        </p>
+          </p></div>
+          <div className="rounded-2xl bg-amber-500/10 px-5 py-4"><p className="text-3xl font-semibold text-amber-700 dark:text-amber-300">{items.length}</p><p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">waiting on Gary</p></div>
+        </div>
       </header>
 
-      <section className="grid gap-5 lg:grid-cols-2">
+      <details className="rounded-2xl border border-border/70 bg-card/60">
+        <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold">Import data manually <span className="font-normal text-muted-foreground">· JSON, CSV, or pasted envelopes</span></summary>
+        <section className="grid gap-5 border-t border-border/70 p-5 lg:grid-cols-2">
         <form action={importInboxFile} className={`grid content-start gap-3 ${fieldCardClass}`}>
           <h2 className="font-medium">Import a CHQ update file</h2>
           <p className="text-sm text-muted-foreground">JSON envelopes and CSV files up to 2 MB are accepted.</p>
@@ -31,39 +37,10 @@ export default async function NeedsReviewPage() {
           <textarea name="payload" required rows={7} className={fieldInputClass} placeholder='{"version":1,"producer":{"type":"chatgpt"},"items":[...]}' />
           <button className={primaryButtonClass}>Queue pasted update</button>
         </form>
-      </section>
+        </section>
+      </details>
 
-      <section className="flex flex-col gap-4">
-        <div><h2 className="text-lg font-medium">Pending items</h2><p className="text-sm text-muted-foreground">{items.length} update{items.length === 1 ? "" : "s"} waiting.</p></div>
-        {items.length === 0 ? <p className={`${fieldCardClass} text-sm text-muted-foreground`}>The inbox is clear.</p> : (
-          <ul className="grid gap-4">
-            {items.map((item) => {
-              const payload = item.payload as Record<string, unknown>;
-              return <li key={item.id} className={`grid gap-4 ${fieldCardClass}`}>
-                <div className="flex flex-wrap justify-between gap-3">
-                  <div><p className="text-xs uppercase tracking-wide text-muted-foreground">{item.item_type} · {item.assertion_state}</p><h3 className="font-medium">{String(payload.label || payload.company || payload.project_key || "Incoming update")}</h3></div>
-                  <div className="text-right text-xs text-muted-foreground"><p>{item.source_type}: {item.source_title}</p>{item.source_timestamp ? <p>{new Date(item.source_timestamp).toLocaleString()}</p> : null}</div>
-                </div>
-                <form action={acceptInbox} className="grid gap-2">
-                  <input type="hidden" name="id" value={item.id} />
-                  {item.item_type === "career_claim" ? <>
-                    <input name="canonical_key" defaultValue={String(payload.canonical_key || "")} required placeholder="Canonical key" className={fieldInputClass} />
-                    <input name="label" defaultValue={String(payload.label || "")} required placeholder="Label" className={fieldInputClass} />
-                    <textarea name="summary" defaultValue={String(payload.summary || "")} required rows={3} className={fieldInputClass} />
-                  </> : <pre className="overflow-auto rounded bg-muted/50 p-3 text-xs">{JSON.stringify(payload, null, 2)}</pre>}
-                  <input name="review_note" required placeholder="Why you are accepting (and what you corrected)" className={fieldInputClass} />
-                  <button className={primaryButtonClass}>Accept into CHQ</button>
-                </form>
-                <form action={rejectInbox} className="flex flex-col gap-2 border-t border-border pt-3 sm:flex-row">
-                  <input type="hidden" name="id" value={item.id} />
-                  <input name="review_note" required placeholder="Reason for rejection" className={`${fieldInputClass} flex-1`} />
-                  <button className="rounded border border-destructive px-3 py-2 text-sm text-destructive">Reject</button>
-                </form>
-              </li>;
-            })}
-          </ul>
-        )}
-      </section>
+      <ReviewQueue items={items} />
     </main>
   );
 }

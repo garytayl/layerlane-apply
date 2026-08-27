@@ -2,40 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Warm neutral palette (from stripped v0 / newtemplate reference) */
 :root {
-  --background: oklch(0.985 0.002 90);
-  --foreground: oklch(0.12 0.01 60);
+  --background: oklch(0.975 0.008 255);
+  --foreground: oklch(0.16 0.025 255);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.12 0.01 60);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.12 0.01 60);
-  --primary: oklch(0.12 0.01 60);
+  --primary: oklch(0.48 0.18 255);
   --primary-foreground: oklch(0.985 0.002 90);
-  --secondary: oklch(0.96 0.005 90);
+  --secondary: oklch(0.94 0.018 255);
   --secondary-foreground: oklch(0.12 0.01 60);
-  --muted: oklch(0.94 0.005 90);
-  --muted-foreground: oklch(0.45 0.02 60);
-  --accent: oklch(0.92 0.01 90);
+  --muted: oklch(0.94 0.012 255);
+  --muted-foreground: oklch(0.5 0.035 255);
+  --accent: oklch(0.91 0.035 255);
   --accent-foreground: oklch(0.12 0.01 60);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.88 0.01 90);
-  --input: oklch(0.92 0.01 90);
-  --ring: oklch(0.12 0.01 60);
-  --radius: 0.25rem;
+  --border: oklch(0.87 0.018 255);
+  --input: oklch(0.88 0.02 255);
+  --ring: oklch(0.48 0.18 255);
+  --radius: 0.75rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: oklch(0.145 0.01 60);
+    --background: oklch(0.13 0.025 255);
     --foreground: oklch(0.985 0.002 90);
-    --card: oklch(0.18 0.01 60);
+    --card: oklch(0.18 0.025 255);
     --card-foreground: oklch(0.985 0.002 90);
     --popover: oklch(0.18 0.01 60);
     --popover-foreground: oklch(0.985 0.002 90);
-    --primary: oklch(0.985 0.002 90);
-    --primary-foreground: oklch(0.12 0.01 60);
+    --primary: oklch(0.72 0.15 250);
+    --primary-foreground: oklch(0.12 0.02 255);
     --secondary: oklch(0.269 0.01 60);
     --secondary-foreground: oklch(0.985 0.002 90);
     --muted: oklch(0.269 0.01 60);
@@ -56,6 +55,10 @@
   }
   body {
     @apply min-h-screen bg-background font-sans text-foreground antialiased;
+    background-image:
+      radial-gradient(circle at 12% 0%, color-mix(in oklab, var(--primary) 10%, transparent), transparent 32rem),
+      linear-gradient(to bottom, color-mix(in oklab, var(--background) 92%, white), var(--background));
+    background-attachment: fixed;
   }
   html {
     scroll-behavior: smooth;
