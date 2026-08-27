@@ -32,3 +32,20 @@ test("foundational data uses structured proposal operations", () => {
   assert.equal(chqBridgeRequestSchema.safeParse({ operation: "propose_experience", external_id: "experience:1", canonical_key: "experience:test", employer: "Example", title: "Engineer", responsibilities: ["Built a system"], source }).success, true);
   assert.equal(chqBridgeRequestSchema.safeParse({ operation: "propose_profile_update", external_id: "profile:bad", name: "Gary", primary_email: "not-an-email", source }).success, false);
 });
+
+test("project proposals and evidence stay behind the local review boundary", () => {
+  const source = { type: "chatgpt_library", title: "Project conversation" };
+  const proposed = chqBridgeRequestSchema.safeParse({
+    operation: "propose_project", external_id: "project:conversation:1",
+    canonical_key: "project:career-hq", project_name: "Career HQ",
+    technologies: ["TypeScript", "PGlite"], source,
+  });
+  assert.equal(proposed.success, true);
+  assert.equal(chqBridgeRequestSchema.safeParse({ operation: "accept_project", proposal_id: crypto.randomUUID() }).success, false);
+  assert.equal(chqBridgeRequestSchema.safeParse({ operation: "verify_project", project_id: crypto.randomUUID() }).success, false);
+  assert.equal(chqBridgeRequestSchema.safeParse({
+    operation: "stage_project_evidence", external_id: "project:evidence:1",
+    project_id: crypto.randomUUID(), note: "Repository evidence", supports: true,
+    source: { type: "github", title: "Repository" },
+  }).success, true);
+});
