@@ -36,21 +36,21 @@ export default async function LocalLedgerPage() {
   const countKind = (kind: string) => records.filter((record) => record.kind === kind).length;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
+    <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 px-3 py-4 sm:gap-8 sm:px-6 sm:py-8 lg:px-8">
       <header className="overflow-hidden rounded-3xl border border-primary/15 bg-card/90 shadow-xl shadow-primary/5">
-        <div className="grid gap-7 p-6 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
           <div><div className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_0_5px] shadow-emerald-500/10" /><p className="text-xs font-bold uppercase tracking-[0.22em] text-primary">Career HQ · local canonical store</p></div>
           <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight sm:text-5xl">Your career, with receipts.</h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">One durable ledger for experience, evidence, projects, and applications. Stored on this computer—not scattered across chats and résumés.</p></div>
-          <div className="flex flex-wrap gap-3 text-sm lg:justify-end">
-            <Link href="/local-ledger/review" className={primaryButtonClass}>Review inbox <span className="ml-1 rounded-full bg-primary-foreground/15 px-2 py-0.5">{needsReview.inbox.length}</span></Link>
-            <Link href="/local-ledger/bridge" className="rounded-xl border border-border bg-background/70 px-4 py-2.5 font-semibold transition hover:border-primary/40">Bridge status</Link>
-            <a href="/local-ledger/snapshot" className="rounded-xl border border-border bg-background/70 px-4 py-2.5 font-semibold transition hover:border-primary/40">Export</a>
+          <div className="grid grid-cols-2 gap-3 text-sm sm:flex sm:flex-wrap lg:justify-end">
+            <Link href="/local-ledger/review" className={`${primaryButtonClass} col-span-2 min-h-12 w-full justify-center sm:w-fit`}>Review inbox <span className="ml-1 rounded-full bg-primary-foreground/15 px-2 py-0.5">{needsReview.inbox.length}</span></Link>
+            <Link href="/local-ledger/bridge" className="flex min-h-11 items-center justify-center rounded-xl border border-border bg-background px-4 py-2.5 text-center font-semibold transition hover:border-primary/40">Bridge status</Link>
+            <a href="/local-ledger/snapshot" className="flex min-h-11 items-center justify-center rounded-xl border border-border bg-background px-4 py-2.5 text-center font-semibold transition hover:border-primary/40">Export</a>
           </div>
         </div>
       </header>
 
-      <section className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {[
           ["Experience", countKind("experience")],
           ["Education", countKind("education")],
@@ -78,7 +78,7 @@ export default async function LocalLedgerPage() {
 
       <details className="rounded-2xl border border-border/70 bg-card/60">
         <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold">Sources and manual data entry <span className="font-normal text-muted-foreground">· {sources.length} stored sources</span></summary>
-      <section className="grid gap-6 border-t border-border/70 p-5 lg:grid-cols-2">
+      <section className="grid gap-6 border-t border-border/70 p-4 sm:p-5 lg:grid-cols-2">
         <div className="flex flex-col gap-4">
           <h2 className="text-lg font-medium">Evidence sources</h2>
           <form action={ingestLocalSource} className={`grid gap-3 ${fieldCardClass}`}>
@@ -110,7 +110,7 @@ export default async function LocalLedgerPage() {
           )}
         </div>
       </section>
-      <section className="flex flex-col gap-4 border-t border-border/70 p-5">
+      <section className="flex flex-col gap-4 border-t border-border/70 p-4 sm:p-5">
         <h2 className="text-lg font-semibold">Add a career fact manually</h2>
         <form action={createLocalLedgerRecord} className={`grid gap-3 ${fieldCardClass}`}>
           <div className="grid gap-3 sm:grid-cols-2">

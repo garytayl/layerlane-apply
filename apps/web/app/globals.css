@@ -146,4 +146,22 @@
       clip-path: inset(0 0 0 0);
     }
   }
+
+  .animate-review-card-in-right { animation: review-card-in-right 280ms cubic-bezier(0.22, 1, 0.36, 1); }
+  .animate-review-card-in-left { animation: review-card-in-left 280ms cubic-bezier(0.22, 1, 0.36, 1); }
+
+  @keyframes review-card-in-right {
+    from { opacity: 0; transform: translateX(2.5rem) rotate(0.75deg) scale(0.985); }
+    to { opacity: 1; transform: translateX(0) rotate(0) scale(1); }
+  }
+
+  @keyframes review-card-in-left {
+    from { opacity: 0; transform: translateX(-2.5rem) rotate(-0.75deg) scale(0.985); }
+    to { opacity: 1; transform: translateX(0) rotate(0) scale(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-review-card-in-right,
+    .animate-review-card-in-left { animation: none; }
+  }
 }
