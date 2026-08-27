@@ -7,8 +7,11 @@
   ],
   "scripts": {
     "build": "npm run build --workspace=web",
+    "build:mcp": "npm run build --workspace=@layerlane/chq-mcp",
     "dev": "npm run dev --workspace=web",
-    "lint": "npm run lint --workspace=web"
+    "dev:mcp": "npm run dev --workspace=@layerlane/chq-mcp",
+    "lint": "npm run lint --workspace=web",
+    "test:mcp": "npm run build:mcp && npm test --workspace=@layerlane/chq-mcp"
   },
   "dependencies": {
     "next": "15.5.24",

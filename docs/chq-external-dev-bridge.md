@@ -61,6 +61,6 @@ Content-Type: application/json
 
 ## ChatGPT / MCP path
 
-The recommended future MCP server is a thin stateless translator: publish one MCP tool per operation above, validate with the shared `@layerlane/core` schema, and call the bridge through HTTPS with one scoped, expiring client token. Host that adapter in a private environment or on the desktop through a private tunnel. Do not embed PGlite access or a generic HTTP proxy in the MCP server.
+The thin stateless MCP translator now lives in `apps/chq-mcp`. It publishes one tool per operation above and calls only this bridge with a scoped, expiring client token. See `chq-mcp-connectivity.md` for local testing and the recommended outbound-only OpenAI Secure MCP Tunnel setup. It does not embed PGlite access or a generic HTTP proxy.
 
 Before remote use, add operating-system secret storage for the client token, a trusted HTTPS tunnel/reverse proxy, token rotation, log retention controls, and backup/recovery for the local ledger. This sprint does not create a public or multi-user service.
