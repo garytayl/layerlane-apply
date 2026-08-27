@@ -47,6 +47,7 @@ export default async function LocalLedgerPage() {
         </p>
         <div className="mt-3 flex flex-wrap gap-3 text-sm">
           <Link href="/local-ledger/review" className={primaryButtonClass}>Review CHQ Inbox ({needsReview.inbox.length})</Link>
+          <Link href="/local-ledger/bridge" className="rounded border border-border px-3 py-2">Bridge diagnostics</Link>
           <a href="/local-ledger/snapshot" className="rounded border border-border px-3 py-2">Export snapshot</a>
         </div>
       </header>

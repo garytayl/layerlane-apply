@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack --hostname 127.0.0.1",
+    "dev:remote": "next dev --turbopack --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:bridge:contract": "node --test tests/chq-bridge.contract.test.mjs",
+    "test:bridge:integration": "node tests/chq-bridge.integration.mjs"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.10",

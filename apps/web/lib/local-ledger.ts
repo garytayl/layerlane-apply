@@ -55,6 +55,7 @@ export type LocalInboxItem = {
   item_type: string;
   status: string;
   assertion_state: string;
+  external_id: string | null;
   payload: Record<string, unknown>;
   source_type: string;
   source_title: string;
@@ -63,6 +64,29 @@ export type LocalInboxItem = {
   review_note: string | null;
   created_at: string;
   reviewed_at: string | null;
+};
+
+export type BridgeClient = {
+  id: string;
+  name: string;
+  scopes: string[];
+  expires_at: string;
+  revoked_at: string | null;
+  last_used_at: string | null;
+  created_at: string;
+};
+
+export type BridgeRequestLog = {
+  id: string;
+  request_id: string;
+  client_id: string | null;
+  client_name: string | null;
+  operation: string | null;
+  outcome: string;
+  status_code: number;
+  source_type: string | null;
+  source_ref: string | null;
+  created_at: string;
 };
 
 type LocalLedgerGlobal = typeof globalThis & {
@@ -189,6 +213,37 @@ async function initializeLocalDb() {
       note text,
       created_at timestamptz not null default now()
     );
+
+    create table if not exists chq_bridge_clients (
+      id uuid primary key,
+      name text not null,
+      token_hash text not null unique,
+      scopes text[] not null,
+      expires_at timestamptz not null,
+      revoked_at timestamptz,
+      last_used_at timestamptz,
+      created_at timestamptz not null default now()
+    );
+
+    create table if not exists chq_bridge_request_log (
+      id uuid primary key,
+      request_id uuid not null unique,
+      client_id uuid references chq_bridge_clients (id) on delete set null,
+      client_name text,
+      operation text,
+      outcome text not null,
+      status_code integer not null,
+      ip_hash text not null,
+      source_type text,
+      source_ref text,
+      metadata jsonb not null default '{}'::jsonb,
+      created_at timestamptz not null default now()
+    );
+
+    create index if not exists chq_bridge_request_log_client_time_idx
+      on chq_bridge_request_log (client_id, created_at desc);
+    create index if not exists chq_bridge_request_log_ip_time_idx
+      on chq_bridge_request_log (ip_hash, created_at desc);
   `);
 
   return db;
@@ -248,12 +303,32 @@ export async function listLocalLedgerSources(): Promise<LocalLedgerSource[]> {
 export async function listLocalInboxItems(status = "pending"): Promise<LocalInboxItem[]> {
   const db = await getLocalLedgerDb();
   const result = await db.query<LocalInboxItem>(`
-    select id::text, batch_id::text, item_type, status, assertion_state, payload,
+    select id::text, batch_id::text, item_type, status, assertion_state, external_id, payload,
       source_type, source_title, source_ref, source_timestamp::text,
       review_note, created_at::text, reviewed_at::text
     from chq_inbox_items
     where status = $1
     order by created_at asc
   `, [status]);
+  return result.rows;
+}
+
+export async function listBridgeClients(): Promise<BridgeClient[]> {
+  const db = await getLocalLedgerDb();
+  const result = await db.query<BridgeClient>(`
+    select id::text, name, scopes, expires_at::text, revoked_at::text,
+      last_used_at::text, created_at::text
+    from chq_bridge_clients order by created_at desc
+  `);
+  return result.rows;
+}
+
+export async function listBridgeRequestLogs(limit = 50): Promise<BridgeRequestLog[]> {
+  const db = await getLocalLedgerDb();
+  const result = await db.query<BridgeRequestLog>(`
+    select id::text, request_id::text, client_id::text, client_name, operation,
+      outcome, status_code, source_type, source_ref, created_at::text
+    from chq_bridge_request_log order by created_at desc limit $1
+  `, [Math.min(Math.max(limit, 1), 200)]);
   return result.rows;
 }

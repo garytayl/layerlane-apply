@@ -271,6 +271,22 @@ export async function getLedgerOverview() {
   return { records, sources };
 }
 
+export async function getApplicationPipeline() {
+  const db = await getLocalLedgerDb();
+  const applications = await db.query(`
+    select a.id::text, a.company, a.role, a.current_status, a.created_at::text,
+      a.updated_at::text,
+      coalesce(json_agg(json_build_object(
+        'id', e.id::text, 'status', e.status, 'occurred_at', e.occurred_at,
+        'note', e.note
+      ) order by e.occurred_at) filter (where e.id is not null), '[]') as events
+    from applications a
+    left join application_status_events e on e.application_id = a.id
+    group by a.id order by a.updated_at desc
+  `);
+  return applications.rows;
+}
+
 export async function executeChqOperation(rawRequest: unknown) {
   const request = chqOperationRequestSchema.parse(rawRequest);
   return executeParsedOperation(request);

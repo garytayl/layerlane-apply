@@ -2,6 +2,7 @@ import { executeChqOperation } from "@/lib/chq-service";
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { getBridgeMode, isLoopbackHostname } from "@/lib/chq-bridge";
 
 export const runtime = "nodejs";
 
@@ -24,6 +25,8 @@ const operationNames = [
 ] as const;
 
 function isAuthorized(request: Request) {
+  if (getBridgeMode() !== "local") return false;
+  if (!isLoopbackHostname(new URL(request.url).hostname)) return false;
   const expected = process.env.CHQ_TOOL_TOKEN?.trim();
   if (!expected) return false;
   const header = request.headers.get("authorization") || "";

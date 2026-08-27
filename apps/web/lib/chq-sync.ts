@@ -107,10 +107,10 @@ export async function importSyncEnvelope(envelope: ChqSyncEnvelope, format: "jso
   return { batch_id: batchId, imported, duplicates, status: "queued_for_review" as const };
 }
 
-export async function queueSyncItem(item: ChqSyncItem, producerType = "chatgpt") {
+export async function queueSyncItem(item: ChqSyncItem, producerType = "chatgpt", producerName?: string) {
   return importSyncEnvelope(chqSyncEnvelopeSchema.parse({
     version: 1,
-    producer: { type: producerType },
+    producer: { type: producerType, name: producerName },
     items: [item],
   }), "json");
 }

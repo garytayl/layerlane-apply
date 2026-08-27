@@ -1,10 +1,11 @@
 import { exportChqSnapshot } from "@/lib/chq-sync";
+import { getBridgeMode } from "@/lib/chq-bridge";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const hostname = new URL(request.url).hostname;
-  if (!["localhost", "127.0.0.1", "::1"].includes(hostname)) {
+  if (getBridgeMode() !== "local" || !["localhost", "127.0.0.1", "::1"].includes(hostname)) {
     return Response.json({ error: "Local snapshot export is only available on this computer" }, { status: 403 });
   }
   return new Response(JSON.stringify(await exportChqSnapshot(), null, 2), {

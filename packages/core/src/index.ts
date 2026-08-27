@@ -55,3 +55,11 @@ export {
   type ChqSyncEnvelope,
   type ChqSyncItem,
 } from "./chq-service";
+export {
+  chqBridgeRequestSchema,
+  chqBridgeScopeByOperation,
+  chqBridgeScopeSchema,
+  type ChqBridgeOperation,
+  type ChqBridgeRequest,
+  type ChqBridgeScope,
+} from "./chq-bridge";
