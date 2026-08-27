@@ -40,7 +40,11 @@ function ReviewCard({ item, direction, onBrowse }: { item: LocalInboxItem; direc
   const [drag, setDrag] = useState(0);
   const pointerStart = useRef<number | null>(null);
   const fields = fieldsFor(item);
-  function pointerDown(event: React.PointerEvent<HTMLDivElement>) { if (editing) return; pointerStart.current = event.clientX; event.currentTarget.setPointerCapture(event.pointerId); }
+  function pointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    if (editing || (event.target as HTMLElement).closest("button, input, textarea, select, summary, a")) return;
+    pointerStart.current = event.clientX;
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }
   function pointerMove(event: React.PointerEvent<HTMLDivElement>) { if (pointerStart.current !== null && !editing) setDrag(Math.max(-130, Math.min(130, event.clientX - pointerStart.current))); }
   function pointerUp() { if (Math.abs(drag) > 75) onBrowse(drag < 0 ? "left" : "right"); pointerStart.current = null; setDrag(0); }
   const typeLabel = item.item_type.replaceAll("_", " ");
