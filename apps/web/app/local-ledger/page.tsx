@@ -4,13 +4,14 @@ import {
   verificationMethodSchema,
   verificationStatusSchema,
 } from "@layerlane/core";
+import Link from "next/link";
 import {
   fieldCardClass,
   fieldInputClass,
   listItemCardClass,
   primaryButtonClass,
 } from "@/lib/form-classes";
-import { getLedgerOverview, listConflicts, listNeedsReview } from "@/lib/chq-service";
+import { getLedgerOverview, getNeedsReview, listConflicts } from "@/lib/chq-service";
 import {
   addLocalLedgerEvidence,
   createLocalLedgerRecord,
@@ -30,7 +31,7 @@ export default async function LocalLedgerPage() {
   const [{ records, sources }, conflicts, needsReview] = await Promise.all([
     getLedgerOverview(),
     listConflicts(),
-    listNeedsReview(),
+    getNeedsReview(),
   ]);
   const countKind = (kind: string) => records.filter((record) => record.kind === kind).length;
 
@@ -44,6 +45,10 @@ export default async function LocalLedgerPage() {
         <p className="max-w-2xl text-sm text-muted-foreground">
           Stored only on this computer. No Supabase project, login, or cloud connection is required.
         </p>
+        <div className="mt-3 flex flex-wrap gap-3 text-sm">
+          <Link href="/local-ledger/review" className={primaryButtonClass}>Review CHQ Inbox ({needsReview.inbox.length})</Link>
+          <a href="/local-ledger/snapshot" className="rounded border border-border px-3 py-2">Export snapshot</a>
+        </div>
       </header>
 
       <section className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -53,7 +58,7 @@ export default async function LocalLedgerPage() {
           ["Skills", countKind("skill")],
           ["Projects", countKind("project")],
           ["Claims", countKind("claim")],
-          ["Needs Gary", needsReview.length],
+          ["Needs Gary", needsReview.inbox.length + needsReview.ledger.length],
         ].map(([label, count]) => (
           <div key={label} className={fieldCardClass}>
             <p className="text-xs text-muted-foreground">{label}</p>

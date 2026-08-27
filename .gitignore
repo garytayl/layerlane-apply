@@ -8,6 +8,7 @@ node_modules/
 
 # Local Career HQ database
 .chq/
+work/
 
 # Next.js
 .next/

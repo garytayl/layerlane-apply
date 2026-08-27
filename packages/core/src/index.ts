@@ -44,8 +44,14 @@ export {
 } from "./career-ledger";
 export {
   chqOperationRequestSchema,
+  chqAssertionStateSchema,
+  chqInboxItemTypeSchema,
   chqSourceKindSchema,
+  chqSyncEnvelopeSchema,
+  chqSyncItemSchema,
   type ChqOperationName,
   type ChqOperationRequest,
   type ChqSourceKind,
+  type ChqSyncEnvelope,
+  type ChqSyncItem,
 } from "./chq-service";

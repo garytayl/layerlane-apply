@@ -12,6 +12,7 @@ import {
   getLocalLedgerDb,
   listLocalLedgerRecords,
   listLocalLedgerSources,
+  listLocalInboxItems,
 } from "@/lib/local-ledger";
 
 export async function getCandidateProfile() {
@@ -68,6 +69,24 @@ export async function searchEvidence(query: string) {
   return result.rows;
 }
 
+export async function searchVerifiedEvidence(query: string) {
+  const db = await getLocalLedgerDb();
+  const result = await db.query(
+    `select e.id::text, e.ledger_record_id::text, r.label as record_label,
+       r.kind as record_kind, s.title as source_title, e.quote, e.note,
+       e.supports, e.created_at::text
+     from ledger_evidence e
+     join career_ledger_records r on r.id = e.ledger_record_id
+     left join local_sources s on s.id = e.source_id
+     where r.verification_status = 'verified' and e.supports = true
+       and (coalesce(e.quote, '') ilike $1 or coalesce(e.note, '') ilike $1
+         or r.label ilike $1 or coalesce(s.title, '') ilike $1)
+     order by e.created_at desc`,
+    [`%${query}%`],
+  );
+  return result.rows;
+}
+
 export async function getProjectEvidence(projectId: string) {
   const records = await listLocalLedgerRecords();
   const project = records.find((record) => record.id === projectId && record.kind === "project");
@@ -92,6 +111,11 @@ export async function listConflicts() {
 
 export async function listNeedsReview() {
   return (await listLocalLedgerRecords()).filter((record) => record.needs_review);
+}
+
+export async function getNeedsReview() {
+  const [inbox, ledger] = await Promise.all([listLocalInboxItems(), listNeedsReview()]);
+  return { inbox, ledger };
 }
 
 export async function createLedgerRecord(input: {
@@ -255,8 +279,47 @@ export async function executeChqOperation(rawRequest: unknown) {
 async function executeParsedOperation(request: ChqOperationRequest): Promise<unknown> {
   switch (request.operation) {
     case "get_candidate_profile": return getCandidateProfile();
+    case "get_needs_review": return getNeedsReview();
+    case "export_snapshot": return (await import("@/lib/chq-sync")).exportChqSnapshot();
+    case "generate_resume_context": {
+      const records = await listLocalLedgerRecords();
+      return records.filter((record) => record.verification_status === "verified");
+    }
     case "list_experience": return listExperience();
     case "search_evidence": return searchEvidence(request.query);
+    case "search_verified_evidence": return searchVerifiedEvidence(request.query);
+    case "propose_career_claim":
+      return (await import("@/lib/chq-sync")).queueSyncItem({
+        type: "career_claim", external_id: request.external_id, canonical_key: request.canonical_key, label: request.label,
+        summary: request.summary, assertion_state: request.assertion_state, source: request.source,
+        supports: true,
+      });
+    case "record_application":
+      return (await import("@/lib/chq-sync")).queueSyncItem({
+        type: "application_event", external_id: request.external_id, company: request.company, role: request.role,
+        status: request.status, occurred_at: request.occurred_at,
+        assertion_state: "proposed", source: request.source, supports: true,
+      });
+    case "update_application_status":
+      return (await import("@/lib/chq-sync")).queueSyncItem({
+        type: "application_event", external_id: request.external_id, application_id: request.application_id,
+        status: request.status, occurred_at: request.occurred_at,
+        assertion_state: "proposed", source: request.source, supports: true,
+      });
+    case "add_project_evidence": {
+      if (!request.quote && !request.note) throw new Error("Project evidence needs a quote or note");
+      const db = await getLocalLedgerDb();
+      const project = await db.query<{ canonical_key: string }>(
+        "select canonical_key from career_ledger_records where id = $1 and kind = 'project'",
+        [request.project_id],
+      );
+      if (!project.rows[0]) throw new Error("Project not found");
+      return (await import("@/lib/chq-sync")).queueSyncItem({
+        type: "project_evidence", external_id: request.external_id, project_key: project.rows[0].canonical_key,
+        quote: request.quote, note: request.note, supports: request.supports,
+        assertion_state: "proposed", source: request.source,
+      });
+    }
     case "get_project_evidence": return getProjectEvidence(request.project_id);
     case "list_unverified_claims": return listUnverifiedClaims();
     case "list_conflicts": return listConflicts();

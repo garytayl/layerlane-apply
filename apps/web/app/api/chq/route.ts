@@ -7,13 +7,19 @@ export const runtime = "nodejs";
 
 const operationNames = [
   "get_candidate_profile",
+  "get_needs_review",
+  "export_snapshot",
+  "generate_resume_context",
   "list_experience",
   "search_evidence",
+  "search_verified_evidence",
+  "propose_career_claim",
+  "record_application",
+  "update_application_status",
+  "add_project_evidence",
   "get_project_evidence",
   "list_unverified_claims",
   "list_conflicts",
-  "confirm_claim",
-  "reject_claim",
   "ingest_source",
 ] as const;
 
@@ -52,7 +58,17 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   if (!isAuthorized(request)) return unauthorizedResponse();
   try {
-    const result = await executeChqOperation(await request.json());
+    const body: unknown = await request.json();
+    const operation = typeof body === "object" && body !== null && "operation" in body
+      ? String(body.operation)
+      : "";
+    if (["confirm_claim", "reject_claim"].includes(operation)) {
+      return NextResponse.json(
+        { error: "Verification decisions are local-only and require the Needs Review workflow" },
+        { status: 403 },
+      );
+    }
+    const result = await executeChqOperation(body);
     return NextResponse.json({ ok: true, result });
   } catch (error) {
     if (error instanceof ZodError) {

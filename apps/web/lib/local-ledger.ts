@@ -49,6 +49,22 @@ export type LocalLedgerSource = {
   created_at: string;
 };
 
+export type LocalInboxItem = {
+  id: string;
+  batch_id: string;
+  item_type: string;
+  status: string;
+  assertion_state: string;
+  payload: Record<string, unknown>;
+  source_type: string;
+  source_title: string;
+  source_ref: string | null;
+  source_timestamp: string | null;
+  review_note: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+};
+
 type LocalLedgerGlobal = typeof globalThis & {
   __careerHqLocalDb?: Promise<PGlite>;
 };
@@ -123,6 +139,56 @@ async function initializeLocalDb() {
       rationale text not null,
       created_at timestamptz not null default now()
     );
+
+    create table if not exists chq_sync_batches (
+      id uuid primary key,
+      direction text not null check (direction in ('inbound', 'outbound')),
+      format text not null check (format in ('json', 'csv', 'snapshot')),
+      producer_type text not null,
+      producer_name text,
+      payload_hash text not null,
+      item_count integer not null default 0,
+      created_at timestamptz not null default now()
+    );
+
+    create table if not exists chq_inbox_items (
+      id uuid primary key,
+      batch_id uuid not null references chq_sync_batches (id) on delete cascade,
+      item_type text not null check (item_type in ('career_claim', 'application_event', 'project_evidence')),
+      status text not null default 'pending' check (status in ('pending', 'accepted', 'rejected')),
+      assertion_state text not null check (assertion_state in ('proposed', 'user_confirmed')),
+      external_id text,
+      payload jsonb not null,
+      source_type text not null,
+      source_title text not null,
+      source_ref text,
+      source_timestamp timestamptz,
+      review_note text,
+      created_at timestamptz not null default now(),
+      reviewed_at timestamptz
+    );
+
+    create unique index if not exists chq_inbox_external_id_idx
+      on chq_inbox_items (source_type, external_id) where external_id is not null;
+
+    create table if not exists applications (
+      id uuid primary key,
+      company text not null,
+      role text not null,
+      current_status text not null,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    );
+
+    create table if not exists application_status_events (
+      id uuid primary key,
+      application_id uuid not null references applications (id) on delete cascade,
+      status text not null,
+      occurred_at timestamptz not null,
+      source_id uuid references local_sources (id) on delete set null,
+      note text,
+      created_at timestamptz not null default now()
+    );
   `);
 
   return db;
@@ -177,4 +243,17 @@ export async function listLocalLedgerSources(): Promise<LocalLedgerSource[]> {
     order by created_at desc
   `);
   return sources.rows;
+}
+
+export async function listLocalInboxItems(status = "pending"): Promise<LocalInboxItem[]> {
+  const db = await getLocalLedgerDb();
+  const result = await db.query<LocalInboxItem>(`
+    select id::text, batch_id::text, item_type, status, assertion_state, payload,
+      source_type, source_title, source_ref, source_timestamp::text,
+      review_note, created_at::text, reviewed_at::text
+    from chq_inbox_items
+    where status = $1
+    order by created_at asc
+  `, [status]);
+  return result.rows;
 }
