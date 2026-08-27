@@ -3,7 +3,8 @@ const MAX_RESPONSE_BYTES = 1_048_576;
 export const bridgeOperations = [
   "get_candidate_profile", "list_experience", "search_evidence", "get_project_evidence",
   "list_needs_review", "propose_claim", "stage_application_event",
-  "stage_project_evidence", "get_application_pipeline",
+  "stage_project_evidence", "get_application_pipeline", "propose_profile_update",
+  "propose_education", "propose_experience", "propose_project", "propose_skills",
 ] as const;
 
 export type BridgeOperation = (typeof bridgeOperations)[number];

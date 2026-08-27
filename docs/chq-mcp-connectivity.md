@@ -57,3 +57,6 @@ The remaining external prerequisites are OpenAI Platform access to create a Tunn
 - Keep the app and bridge on loopback; the OpenAI tunnel should be the only remote path.
 - Accept, correct, or reject every proposed write locally in Needs Review.
 - Never describe a staged or user-confirmed claim as verified.
+# Typed foundational proposals
+
+Identity, education, experience, projects, and skills must use their typed proposal tools. `propose_claim` is reserved for atomic narrative claims; it is not a generic entity-write primitive. Every proposal still stops in local Needs Review and cannot be remotely verified.

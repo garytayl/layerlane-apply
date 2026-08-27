@@ -30,17 +30,16 @@ export async function importInboxText(formData: FormData) {
 }
 
 export async function acceptInbox(formData: FormData) {
+  const fields = Object.fromEntries([...formData.entries()].filter(([key]) => key !== "id" && key !== "review_note"));
   await acceptInboxItem({
     id: required(formData, "id"),
-    canonicalKey: String(formData.get("canonical_key") ?? ""),
-    label: String(formData.get("label") ?? ""),
-    summary: String(formData.get("summary") ?? ""),
-    reviewNote: required(formData, "review_note"),
+    fields,
+    reviewNote: String(formData.get("review_note") ?? "").trim() || "Accepted after local review",
   });
   refresh();
 }
 
 export async function rejectInbox(formData: FormData) {
-  await rejectInboxItem(required(formData, "id"), required(formData, "review_note"));
+  await rejectInboxItem(required(formData, "id"), String(formData.get("review_note") ?? "").trim() || "Rejected after local review");
   refresh();
 }

@@ -95,6 +95,64 @@ type LocalLedgerGlobal = typeof globalThis & {
 
 const globalForLedger = globalThis as LocalLedgerGlobal;
 
+function splitList(value: string) {
+  return value.split(/,|\band\b/i).map((item) => item.trim()).filter(Boolean);
+}
+
+function typedLegacyProposal(payload: Record<string, unknown>) {
+  const canonicalKey = String(payload.canonical_key || "");
+  const summary = String(payload.summary || "");
+  const label = String(payload.label || "");
+  if (canonicalKey.startsWith("identity:")) {
+    const email = summary.match(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/)?.[0];
+    const phone = summary.match(/\(\d{3}\)\s*\d{3}-\d{4}/)?.[0];
+    const portfolio = summary.match(/portfolio\s+([^\s.]+(?:\.[^\s.]+)?)/i)?.[1];
+    return { ...payload, type: "profile_update", name: summary.split(".")[0]?.trim(), primary_email: email, phone, portfolio_url: portfolio };
+  }
+  if (canonicalKey.startsWith("education:")) {
+    const [institution, degreePart, graduationDate, gpaPart] = summary.split(";").map((part) => part.trim().replace(/\.$/, ""));
+    const degreeMatch = degreePart?.match(/^(.*?)\s+([^()]+?)(?:\s*\((.*?)\))?$/);
+    return { ...payload, type: "education_proposal", institution, degree: degreeMatch?.[1], major: degreeMatch?.[2]?.trim(), concentration: degreeMatch?.[3], graduation_date: graduationDate, gpa: gpaPart?.replace(/^GPA\s*/i, "") };
+  }
+  if (canonicalKey.startsWith("experience:")) {
+    const [title, employerFromLabel] = label.split(/\s+—\s+/);
+    const details = summary.match(/at (.*?) in (.*?),\s+([A-Z][a-z]{2}\s+\d{4})[–-](Present|[A-Z][a-z]{2}\s+\d{4})\./);
+    const responsibilities = summary.match(/(?:Resume states:|Responsibilities stated:)\s*(.*?)(?:\s+Current-status wording|$)/i)?.[1];
+    const currentDetails = summary.match(/,\s*([^,]+),\s+beginning\s+([A-Z][a-z]{2}\s+\d{4})\s+and marked Present/i);
+    return { ...payload, type: "experience_proposal", employer: employerFromLabel || details?.[1], title, location: details?.[2] || currentDetails?.[1], start_date: details?.[3] || currentDetails?.[2], end_date: details?.[4] === "Present" ? undefined : details?.[4], is_current: details?.[4] === "Present" || Boolean(currentDetails), responsibilities: responsibilities ? [responsibilities.replace(/\.$/, "")] : [] };
+  }
+  if (canonicalKey.startsWith("project:")) {
+    const technologies = summary.match(/using\s+(.+?),\s+marked/i)?.[1];
+    const projectUrl = summary.match(/(?:Case study listed at|https?:\/\/)\s*(https?:\/\/)?([^\s.]+(?:\.[^\s.]+)+)/i);
+    return { ...payload, type: "project_proposal", project_name: label, project_status: /in progress/i.test(summary) ? "in_progress" : undefined, project_url: projectUrl ? `${projectUrl[1] || "https://"}${projectUrl[2]}` : undefined, technologies: technologies ? splitList(technologies) : [], summary };
+  }
+  if (canonicalKey.startsWith("skills:")) {
+    const stated = summary.match(/explicitly lists:\s*(.*?)(?:\.\s|$)/i)?.[1] || "";
+    return { ...payload, type: "skill_proposal", skills: splitList(stated.replace(/,\s+and\s+/i, ", ")) };
+  }
+  return null;
+}
+
+async function migrateLegacyInboxProposals(db: PGlite) {
+  const legacy = await db.query<{ id: string; payload: Record<string, unknown> }>(
+    "select id::text, payload from chq_inbox_items where status = 'pending' and item_type = 'career_claim'",
+  );
+  for (const item of legacy.rows) {
+    const proposal = typedLegacyProposal(item.payload);
+    if (!proposal || proposal.type === "career_claim") continue;
+    await db.query("update chq_inbox_items set item_type = $2, payload = $3::jsonb where id = $1", [item.id, proposal.type, JSON.stringify(proposal)]);
+  }
+  const structured = await db.query<{ id: string; payload: Record<string, unknown> }>(
+    "select id::text, payload from chq_inbox_items where status = 'pending' and item_type in ('experience_proposal', 'project_proposal')",
+  );
+  for (const item of structured.rows) {
+    const canonicalKey = String(item.payload.canonical_key || "");
+    const original = { ...item.payload, type: "career_claim", canonical_key: canonicalKey };
+    const normalized = typedLegacyProposal(original);
+    if (normalized) await db.query("update chq_inbox_items set payload = $2::jsonb where id = $1", [item.id, JSON.stringify(normalized)]);
+  }
+}
+
 async function initializeLocalDb() {
   const dataDir =
     process.env.CHQ_LOCAL_DATA_DIR?.trim() ||
@@ -178,7 +236,7 @@ async function initializeLocalDb() {
     create table if not exists chq_inbox_items (
       id uuid primary key,
       batch_id uuid not null references chq_sync_batches (id) on delete cascade,
-      item_type text not null check (item_type in ('career_claim', 'application_event', 'project_evidence')),
+      item_type text not null check (item_type in ('profile_update', 'education_proposal', 'experience_proposal', 'project_proposal', 'skill_proposal', 'career_claim', 'application_event', 'project_evidence')),
       status text not null default 'pending' check (status in ('pending', 'accepted', 'rejected')),
       assertion_state text not null check (assertion_state in ('proposed', 'user_confirmed')),
       external_id text,
@@ -245,6 +303,15 @@ async function initializeLocalDb() {
     create index if not exists chq_bridge_request_log_ip_time_idx
       on chq_bridge_request_log (ip_hash, created_at desc);
   `);
+
+  await db.exec(`
+    alter table chq_inbox_items drop constraint if exists chq_inbox_items_item_type_check;
+    alter table chq_inbox_items add constraint chq_inbox_items_item_type_check check (item_type in (
+      'profile_update', 'education_proposal', 'experience_proposal', 'project_proposal',
+      'skill_proposal', 'career_claim', 'application_event', 'project_evidence'
+    ));
+  `);
+  await migrateLegacyInboxProposals(db);
 
   return db;
 }

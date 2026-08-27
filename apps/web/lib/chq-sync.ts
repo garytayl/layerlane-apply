@@ -135,31 +135,69 @@ async function createSourceForItem(item: Awaited<ReturnType<typeof listLocalInbo
 }
 
 export async function acceptInboxItem(input: {
-  id: string; label?: string; summary?: string; canonicalKey?: string; reviewNote: string;
+  id: string; fields: Record<string, unknown>; reviewNote: string;
 }) {
   const db = await getLocalLedgerDb();
   const pending = (await listLocalInboxItems()).find((item) => item.id === input.id);
   if (!pending) throw new Error("Pending inbox item not found");
   const payload = pending.payload as ChqSyncItem;
+  const assertionState = pending.assertion_state;
   const source = await createSourceForItem(pending);
 
-  if (pending.item_type === "career_claim") {
-    const label = input.label?.trim() || payload.label;
-    const summary = input.summary?.trim() || payload.summary;
-    const canonicalKey = input.canonicalKey?.trim() || payload.canonical_key;
-    if (!label || !summary || !canonicalKey) throw new Error("Claim needs canonical key, label, and summary");
+  async function upsertEntity(kind: string, canonicalKey: string, label: string, value: Record<string, unknown>) {
     const recordId = crypto.randomUUID();
     await db.query(
       `insert into career_ledger_records
         (id, kind, canonical_key, label, value, verification_status, confidence, needs_review)
-       values ($1, 'claim', $2, $3, $4::jsonb, 'supported', $5, false)
-       on conflict (canonical_key) do update set label = excluded.label, value = excluded.value,
-         verification_status = 'supported', needs_review = false, updated_at = now()`,
-      [recordId, canonicalKey, label, JSON.stringify({ summary }), pending.assertion_state === "user_confirmed" ? 0.8 : 0.5],
+       values ($1, $2, $3, $4, $5::jsonb, 'supported', $6, false)
+       on conflict (canonical_key) do update set kind = excluded.kind, label = excluded.label,
+         value = excluded.value, verification_status = 'supported', needs_review = false, updated_at = now()`,
+      [recordId, kind, canonicalKey, label, JSON.stringify(value), assertionState === "user_confirmed" ? 0.8 : 0.5],
     );
     const found = await db.query<{ id: string }>("select id::text from career_ledger_records where canonical_key = $1", [canonicalKey]);
     await addLedgerEvidence({ ledgerRecordId: found.rows[0].id, sourceId: source.source_id, note: `Accepted from CHQ Inbox: ${input.reviewNote}`, supports: true });
     await db.query("update career_ledger_records set needs_review = false where id = $1", [found.rows[0].id]);
+  }
+
+  const text = (key: string) => String(input.fields[key] ?? "").trim();
+  const optional = (key: string) => text(key) || null;
+
+  if (pending.item_type === "career_claim") {
+    const label = text("label") || payload.label;
+    const summary = text("summary") || payload.summary;
+    const canonicalKey = text("canonical_key") || payload.canonical_key;
+    if (!label || !summary || !canonicalKey) throw new Error("Claim needs canonical key, label, and summary");
+    await upsertEntity("claim", canonicalKey, label, { summary });
+  } else if (pending.item_type === "profile_update") {
+    const name = text("name");
+    if (!name) throw new Error("Profile update needs a name");
+    await upsertEntity("identity", String(payload.canonical_key || "identity:primary-profile"), name, {
+      name, primary_email: optional("primary_email"), phone: optional("phone"), portfolio_url: optional("portfolio_url"),
+    });
+  } else if (pending.item_type === "education_proposal") {
+    const institution = text("institution");
+    const degree = text("degree");
+    if (!institution || !degree) throw new Error("Education needs an institution and degree");
+    await upsertEntity("education", String(payload.canonical_key || `education:${institution.toLowerCase().replace(/\W+/g, "-")}`), `${degree} — ${institution}`, {
+      institution, degree, major: optional("major"), concentration: optional("concentration"), graduation_date: optional("graduation_date"), gpa: optional("gpa"),
+    });
+  } else if (pending.item_type === "experience_proposal") {
+    const employer = text("employer");
+    const title = text("title");
+    if (!employer || !title) throw new Error("Experience needs an employer and title");
+    await upsertEntity("experience", String(payload.canonical_key || `experience:${employer.toLowerCase().replace(/\W+/g, "-")}:${title.toLowerCase().replace(/\W+/g, "-")}`), `${title} — ${employer}`, {
+      employer, title, location: optional("location"), start_date: optional("start_date"), end_date: optional("end_date"), is_current: input.fields.is_current === "on", responsibilities: text("responsibilities").split(/\r?\n/).map((value) => value.trim()).filter(Boolean),
+    });
+  } else if (pending.item_type === "project_proposal") {
+    const name = text("project_name");
+    if (!name) throw new Error("Project needs a name");
+    await upsertEntity("project", String(payload.canonical_key || `project:${name.toLowerCase().replace(/\W+/g, "-")}`), name, {
+      name, status: optional("project_status"), url: optional("project_url"), technologies: text("technologies").split(/,|\r?\n/).map((value) => value.trim()).filter(Boolean), summary: optional("summary"),
+    });
+  } else if (pending.item_type === "skill_proposal") {
+    const skills = text("skills").split(/,|\r?\n/).map((value) => value.trim()).filter(Boolean);
+    if (!skills.length) throw new Error("Skill proposal needs at least one skill");
+    for (const skill of skills) await upsertEntity("skill", `skill:${skill.toLowerCase().replace(/\W+/g, "-")}`, skill, { name: skill });
   } else if (pending.item_type === "application_event") {
     let applicationId = payload.application_id;
     if (!applicationId) {
